@@ -4,25 +4,26 @@
  * Mangoba, Michael
  * Tiongquico, Erik
 */
-% input(Question) :-
 
-input(Question) :-
 
 write('Trip Advisor Agent (TAA) Israel').
-write('Would you like to travel to Israel?'),
-read(answer), nl,
-    ((answer == yes; answer  == y)
-    -> 
+write('Would you like to travel to Israel?').
 
-    assert(yes(Question));
-    assert(no(Question), fail).
 
-    )
+% --------------- Everything below is the knowledge base --------------- %
 
-:- dynamic yes/1,no/1.
+% input(Question) :-
 
-verify(Order) :-
-    (yes(Order)) :-
-        -> true;
-    (no(Order)) :-
-        -> fail;
+traveler(X).
+
+date(
+    startdate(Month, Day, Year),
+    enddate(Month, Day, Year)
+    ).
+
+% Profile of User
+% Genders
+male(X) :- \+female(X).
+female(X) :- \+male(X).
+
+% Purposes
