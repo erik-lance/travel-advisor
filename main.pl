@@ -5,12 +5,22 @@
  * Tiongquico, Erik
 */
 
+welcome:- 
+    write('Trip Advisor Agent (TAA) Israel'),
+    write('Would you like to travel to Israel?').
 
-write('Trip Advisor Agent (TAA) Israel').
-write('Would you like to travel to Israel?').
+ask(Question) :-
+    write(Question),
+    write('(yes/no)'),
+    read(Response),
+    nl,
+    ((Response == yes; Response == y) -> assert(yes(Question));
+     (Respones ==  no; Response == n) -> assert(no(Question));
+    write('Sorry. I do not recognize this input.'),fail).
 
 
 % --------------- Everything below is the knowledge base --------------- %
+
 
 % input(Question) :-
 
