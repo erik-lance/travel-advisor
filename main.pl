@@ -7,7 +7,7 @@
 
 welcome:- 
     write('Trip Advisor Agent (TAA) Israel'),
-    write('Would you like to travel to Israel?').
+    ask('Would you like to travel to Israel?').
 
 ask(Question) :-
     write(Question),
@@ -18,6 +18,17 @@ ask(Question) :-
      (Respones ==  no; Response == n) -> assert(no(Question));
     write('Sorry. I do not recognize this input.'),fail).
 
+% % Fixes argumentation of yes/no dynamics
+% :- dynamic yes/1, no/1.
+
+% verify(Order) :-
+%     (yes(Order) :-
+%         ->
+%         true;
+%     (no(Order)
+%         ->
+%         fail;
+%     ask(Order))).
 
 % --------------- Everything below is the knowledge base --------------- %
 
@@ -26,7 +37,7 @@ ask(Question) :-
 
 traveler(X).
 
-date(
+traveldate(
     startdate(Month, Day, Year),
     enddate(Month, Day, Year)
     ).
