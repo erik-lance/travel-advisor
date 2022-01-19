@@ -9,6 +9,7 @@ welcome:-
     write('Trip Advisor Agent (TAA) Israel'),
     ask('Would you like to travel to Israel?').
 
+% This will be used for yes/no questions only.
 ask(Question) :-
     write(Question),
     write('(yes/no)'),
@@ -17,6 +18,17 @@ ask(Question) :-
     ((Response == yes; Response == y) -> assert(yes(Question));
      (Respones ==  no; Response == n) -> assert(no(Question));
     write('Sorry. I do not recognize this input.'),fail).
+
+% This will be used for questions that prompt specific words or answers e.g. nationality
+% edit: Might be better to create a separate function for each type of prompt? We need a proper fact declaration.
+
+% prompt(Question) :-
+%     write(Question),
+%     read(Response),
+%     nl,
+%     ((Response == yes; Response == y) -> assert(yes(Question));
+%      (Respones ==  no; Response == n) -> assert(no(Question));
+%     write('Sorry. I do not recognize this input.'),fail).
 
 % % Fixes argumentation of yes/no dynamics
 % :- dynamic yes/1, no/1.
