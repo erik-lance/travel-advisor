@@ -52,7 +52,7 @@ traveler(X).
 traveldate(
     startdate(Month, Day, Year),
     enddate(Month, Day, Year)
-    ).
+).
 
 % Profile of User
 % Genders
@@ -60,3 +60,29 @@ male(X) :- \+female(X).
 female(X) :- \+male(X).
 
 % Purposes
+
+% COVID tests
+
+vaccine(
+    Brand,
+    Doses,
+    Days
+).
+
+booster(
+    Brand,
+    Days
+).
+
+% Applies both to normal vac or booster
+% validbrand(brand, days(min, max))
+validbrand(pfizer, days(7, 180)).
+validbrand(moderna, days(14, 180)).
+validbrand(asterzeneca, days(14, 180)).
+validbrand(sinovac, days(14, 180)).
+validbrand(sinopharm, days(14, 180)).
+validbrand(jj, days(14, 180)).
+
+
+% If recovered from COVID
+% naatTest(X) :-
