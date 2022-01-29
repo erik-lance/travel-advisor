@@ -78,11 +78,39 @@ booster(
 % validbrand(brand, days(min, max))
 validbrand(pfizer, days(7, 180)).
 validbrand(moderna, days(14, 180)).
-validbrand(asterzeneca, days(14, 180)).
+validbrand(astrazeneca, days(14, 180)).
 validbrand(sinovac, days(14, 180)).
 validbrand(sinopharm, days(14, 180)).
 validbrand(jj, days(14, 180)).
 
+% Red List Countries
+
+redlist(botswana).
+redlist(canada).
+redlist(ethiopia).
+redlist(france).
+redlist(hungary).
+redlist(malawi).
+redlist(mexico).
+redlist(nigeria).
+redlist(portugal).
+redlist(southafrica).
+redlist(spain).
+redlist(switzerland).
+redlist(tanzania).
+redlist(trukey).
+redlist(uae).
+redlist(uk).
+redlist(us).
 
 % If recovered from COVID
 % naatTest(X) :-
+
+
+% TBH WE DONT KNOW THESE BAKA DI NEED? kasi eemail directly based on purpose nagiiba eh
+% If traveling for work
+
+
+% If traveling for academics
+
+    
