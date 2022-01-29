@@ -54,6 +54,9 @@ traveldate(
     enddate(Month, Day, Year)
 ).
 
+has(X,Y).
+travel(X,Y).
+
 % Profile of User
 % Genders
 male(X) :- \+female(X).
@@ -65,17 +68,33 @@ female(X) :- \+male(X).
 
 vaccine(
     Brand,
-    Doses,
     Days
 ).
 
-booster(
-    Brand,
-    Days
-).
+% booster(
+%     Brand,
+%     Days
+% ).
+
+vaccinated(X, vaccine(Brand,Days)).
+% vaccinated(X, booster(Brand,Days)).
+days_vaccinated(X, Y).
+
+% Rules
+
+% X is isolated because of Y
+% isolated(X,Y) :-
+%     travel(X,Y),
+%     redlist(Y).
+
+isolated(X) :-
+    list_of_red_countries(L),
+    travel(X,L).
+
 
 % Applies both to normal vac or booster
 % validbrand(brand, days(min, max))
+validbrand(Brand, days(Min, Max)).
 validbrand(pfizer, days(7, 180)).
 validbrand(moderna, days(14, 180)).
 validbrand(astrazeneca, days(14, 180)).
@@ -83,7 +102,19 @@ validbrand(sinovac, days(14, 180)).
 validbrand(sinopharm, days(14, 180)).
 validbrand(jj, days(14, 180)).
 
-% Red List Countries
+list_of_valid_brands(ValidBrand) :- findall(Vaccine, validbrand(Vaccine,_), ValidBrand).
+list_of_valid_vaccinations(ValidVaccine, days(X,Y)) :- findall(Vaccine, validbrand(Vaccine, days(X,Y)), ValidVaccine).
+
+has_validvaccine(X) :-
+    list_of_valid_brands(L),
+    vaccinated(X, vaccine(L,_)),
+    
+   has(X, vaccine(Brand, Doses, _)).
+    
+
+
+% For who will be isolated
+% Red List Countries (as of December 31, 2021)
 
 redlist(botswana).
 redlist(canada).
@@ -102,6 +133,9 @@ redlist(trukey).
 redlist(uae).
 redlist(uk).
 redlist(us).
+
+list_of_red_countries(RedCountry) :- findall(Country, redlist(Country), RedCountry).
+
 
 % If recovered from COVID
 % naatTest(X) :-
