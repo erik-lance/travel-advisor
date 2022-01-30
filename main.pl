@@ -5,7 +5,7 @@
  * Tiongquico, Erik
 */
 
-:- dynamic traveler/1,
+:- dynamic traveler/1, 
         male/1, female/1,
         vaccinated/2, vaccine/2.
 
@@ -15,6 +15,7 @@ welcome:-
     nl,
     % ask('Would you like to travel to Israel?').
     profile,
+    
     write('Thank you.').
 
 
@@ -29,6 +30,8 @@ ask(Question) :-
      (Response ==  no; Response == n) -> assert(no(Question));
     write('Sorry. I do not recognize this input.'),fail).
 
+% ---- Questions ---- %
+
 profile :-
     write('What\'s your name? '),
     read(Name),
@@ -42,21 +45,28 @@ bioprofile(Traveler) :-
     ((Response == male; Response == m) -> assert(male(Traveler));
      (Response == female; Response == f) -> assert(female(Traveler));
     write('Sorry. I do not recognize this input. '), 
-    fail
+    bioprofile(Traveler) %note: i haven't tried this, it just seemed logical to recurse back to bioprofile if it failed kaso it might ask vaccine pa rin
     ),
-    askvaccine(Traveler).
+    write('Are you vaccinated? (y/n) '),
+    read(VacResponse),
+    nl,
+    ((VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
+      write('Edi okay')).
+    
 
 % Asks for brand and days since last vaccination of traveler
+% Note: edit for booster eventually.
 askvaccine(Traveler) :-
-    write('What is your vaccine brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj) '),
+    write('What is your most recent vaccine brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj) '),
     read(ResponseBrand),
     nl,
-    write('When was your last vaccination? '),
+    write('How many days since your last vaccination? '),
     read(ResponseDays),
     nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
 
 
+% ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
 % This will be used for questions that prompt specific words or answers e.g. nationality
 % edit: Might be better to create a separate function for each type of prompt? We need a proper fact declaration.
@@ -81,23 +91,34 @@ askvaccine(Traveler) :-
 %         fail;
 %     ask(Order))).
 
-
-
-
 % --------------- Everything below is the knowledge base --------------- %
 
+% ---- RULES ---- %
 
-% input(Question) :-
+% X has a validvaccine IF
+% X is vaccinated with a valid brand
+has_validvaccine(Traveler) :-
+    vaccinated(Traveler,vaccine(VaccineBrand,Days)),
+    validbrand(Vaccinebrand,days(Min, Max)),
+    Days > Min-1,
+    Days < Max+1.
 
-% traveler(X).
+% Isolation due to invalid vaccine (be it by brand or days vaccinated)
+isolated(Traveler) :- not(has_validvaccine(Traveler)).
+
+% Isolation due to invalid vaccine AND traveled to a red list country.
+isolated(Traveler) :-
+    not(has_validvaccine(Traveler)),
+    travel(Traveler,Country),
+    redlist(Country).
+
+% ---- DICTIONARY ---- %
 
 traveldate(
     startdate(Month, Day, Year),
     enddate(Month, Day, Year)
 ).
 
-% has(X,Y).
-% travel(X,Y).
 list_of_travels(X,TravelList) :- findall(Country, travel(X,Country), TravelList).
 
 % Profile of User
@@ -118,15 +139,6 @@ validbrand(jj, days(14, 180)).
 % For checking
 list_of_valid_brands(ValidBrand) :- findall(Vaccine, validbrand(Vaccine,_), ValidBrand).
 list_of_valid_vaccinations(ValidVaccine, days(X,Y)) :- findall(Vaccine, validbrand(Vaccine, days(X,Y)), ValidVaccine).
-
-% X has a validvaccine IF
-% X is vaccinated with a valid brand
-has_validvaccine(X) :-
-    vaccinated(X,vaccine(VaccineBrand,Days)),
-    validbrand(Vaccinebrand,days(Min, Max)),
-    Days > Min-1,
-    Days < Max+1.
-
 
 % For who will be isolated
 % Red List Countries (as of December 31, 2021)
@@ -152,10 +164,7 @@ redlist(us).
 % For checking
 list_of_red_countries(RedCountry) :- findall(Country, redlist(Country), RedCountry).
 
-isolated(X) :-
-    not(has_validvaccine(X)),
-    travel(X,Y),
-    redlist(Y).
+
 
 % If recovered from COVID
 % naatTest(X) :-
