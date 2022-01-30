@@ -52,7 +52,6 @@ bioprofile(Traveler) :-
     nl,
     ((VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
       write('Edi okay')).
-    
 
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
