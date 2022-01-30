@@ -5,9 +5,19 @@
  * Tiongquico, Erik
 */
 
+:- dynamic traveler/1,
+        male/1, female/1,
+        vaccinated/2, vaccine/2.
+
+
 welcome:- 
     write('Trip Advisor Agent (TAA) Israel'),
-    ask('Would you like to travel to Israel?').
+    nl,
+    % ask('Would you like to travel to Israel?').
+    profile,
+    write('Thank you.').
+
+
 
 % This will be used for yes/no questions only.
 ask(Question) :-
@@ -19,8 +29,34 @@ ask(Question) :-
      (Response ==  no; Response == n) -> assert(no(Question));
     write('Sorry. I do not recognize this input.'),fail).
 
-% bioprofile(Traveller) :-
-%     write('Are you male?').
+profile :-
+    write('What\'s your name? '),
+    read(Name),
+    assert(traveler(Name)),
+    bioprofile(Name).
+
+bioprofile(Traveler) :-
+    write('Are you male or female? (m/f) '),
+    read(Response),
+    nl,
+    ((Response == male; Response == m) -> assert(male(Traveler));
+     (Response == female; Response == f) -> assert(female(Traveler));
+    write('Sorry. I do not recognize this input. '), 
+    fail
+    ),
+    askvaccine(Traveler).
+
+% Asks for brand and days since last vaccination of traveler
+askvaccine(Traveler) :-
+    write('What is your vaccine brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj) '),
+    read(ResponseBrand),
+    nl,
+    write('When was your last vaccination? '),
+    read(ResponseDays),
+    nl,
+    assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
+
+
 
 % This will be used for questions that prompt specific words or answers e.g. nationality
 % edit: Might be better to create a separate function for each type of prompt? We need a proper fact declaration.
@@ -69,34 +105,6 @@ list_of_travels(X,TravelList) :- findall(Country, travel(X,Country), TravelList)
 % Purposes
 
 % COVID tests
-
-% vaccine(
-%     Brand,
-%     Days
-% ).
-
-% booster(
-%     Brand,
-%     Days
-% ).
-
-% vaccinated(X, vaccine(Brand,Days)).
-% vaccinated(X, booster(Brand,Days)).
-% days_vaccinated(X, Y).
-
-% Rules
-
-% X is isolated because of Y
-% isolated(X,Y) :-
-%     travel(X,Y),
-%     redlist(Y).
-
-% isolated(X) :-
-%     list_of_travels(X,ListTravels),
-%     list_of_red_countries(ListRed),
-%     member(ListTravels,ListRed)
-    
-
 
 % Applies both to normal vac or booster
 % validbrand(Brand, days(Min, Max)).
