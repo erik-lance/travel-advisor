@@ -52,11 +52,11 @@ askpurpose(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == t) -> assert(purpose(Traveler, visiting));
+        (Response == t) -> (assert(purpose(Traveler, visiting)), bioprofile(Traveler));
         (Response == w) -> assert(purpose(Traveler, work));
         (Response == s) -> assert(purpose(Traveler, school))
-    ),
-    bioprofile(Traveler).
+    ).
+    
 
 bioprofile(Traveler) :-
     write('Are you male or female? (m/f) '),
