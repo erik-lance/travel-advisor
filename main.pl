@@ -5,7 +5,7 @@
  * Tiongquico, Erik
 */
 
-:- dynamic traveler/1, partysize/1,
+:- dynamic traveler/1, partysize/1, travel/2,
         male/1, female/1,
         vaccinated/2, vaccine/2,
         recentlyPositive/1,
@@ -18,7 +18,7 @@ welcome:-
     % ask('Would you like to travel to Israel?').
     write('What is the size of your party? '),
     read(PartySize), nl,
-    partysize(PartySize),
+    assert(partysize(PartySize)),
     profile,
     
     write('Thank you.').
@@ -43,9 +43,9 @@ profile :-
     write('What\'s your name? '),
     read(Name),
     assert(traveler(Name)),
-    askpurpose(Name).
+    bioprofile(Name).
 
-askpurpose(Traveler) :-
+ askpurpose(Traveler) :-
     write('What is the purpose of your travel?'),
     write('(t) Touring/Visiting'),
     write('(w) Work'),
@@ -56,8 +56,7 @@ askpurpose(Traveler) :-
         (Response == t) -> (assert(purpose(Traveler, visiting)), bioprofile(Traveler));
         (Response == w) -> assert(purpose(Traveler, work));
         (Response == s) -> assert(purpose(Traveler, school))
-    ).
-    
+    ).   
 
 bioprofile(Traveler) :-
     write('Are you male or female? (m/f) '),
@@ -77,7 +76,8 @@ askvaccinated(Traveler) :-
     (
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
         write('Edi okay')
-    ).
+    ),
+    askPositive(Traveler).
 
 % Asks if have been tested positive in the past and recovered
 askPositive(Traveler) :-
