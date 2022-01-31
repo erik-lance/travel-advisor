@@ -24,7 +24,6 @@ welcome:-
     write('Thank you.').
 
 
-
 % This will be used for yes/no questions only.
 ask(Question) :-
     write(Question),
@@ -86,17 +85,15 @@ askPositive(Traveler) :-
     read(Responsepositive),
 	nl,
     (
-			(Responsepositive == yes) -> 
+			(Responsepositive == yes) -> (
 				assert(recentlyPositive(Traveler)),
 				write('have you recieved a health maintenance organization issued Certificate of Recovery'),
 				read(Responsecertificate),
 				nl,
-				((Responsecertificate == no) ->
-					write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered'),
-				);
-				((Responsecertificate == yes) ->
-					assert(hasCertificate(Traveler)),
+				((Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
+				 (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
 				)
+            )
 	).
  
 % Asks for brand and days since last vaccination of traveler
@@ -151,22 +148,21 @@ has_validvaccine(Traveler) :-
 % Isolation due to invalid vaccine (be it by brand or days vaccinated)
 isolated(Traveler) :- not(has_validvaccine(Traveler)).
 
-% Isolation due to invalid vaccine AND traveled to a red list country.
+% % Isolation due to invalid vaccine AND traveled to a red list country.
 isolated(Traveler) :-
-    not(has_validvaccine(Traveler)),
+    % not(has_validvaccine(Traveler)),
     travel(Traveler,Country),
     redlist(Country).
 
 % Isolated due to Recently positive AND no Vaccine AND no HMO recovery Certificate
 isolated(Traveler) :-
-    not(has_validvaccine(Traveler)),
     recentlyPositive(Traveler),
     not(hasCertificate(Traveler)).
 
 % Considered Recovered due to being recently positive AND has HMO recovery Certificate
 recovered(Traveler) :-
     hasCertificate(Traveler),
-    recentlyPositive(Travler).
+    recentlyPositive(Traveler).
 
 % ---- DICTIONARY ---- %
 
@@ -232,8 +228,38 @@ list_of_red_countries(RedCountry) :- findall(Country, redlist(Country), RedCount
 
 % PSEUDODATA
 
+% Isolated due to red country
 traveler(mark).
 male(mark).
 vaccinated(mark, vaccine(pfizer,7)).
-% travel(mark,philippines).
+travel(mark,philippines).
 travel(mark,switzerland).
+
+% Not isolated, has valid vaccine and is considered recovered
+traveler(vincent).
+male(vincent).
+vaccinated(vincent, vaccine(moderna,15)).
+hasCertificate(vincent).
+recentlyPositive(vincent).
+
+% Isolated due to invalid vaccine
+traveler(bulleros).
+male(bulleros).
+vaccinated(bulleros, vaccine(moderna, 189)).
+
+% Considered Recovered, has cert while positive
+traveler(martelino).
+male(martelino).
+hasCertificate(martelino).
+recentlyPositive(martelino).
+
+% Isolated, no valid vaccine
+traveler(kate).
+female(kate).
+vaccinated(kate, vaccine(pfizer,3)).
+
+% Isolated, no vaccine, no cert, and is only recently positive.
+% Also not recovered
+traveler(belo).
+female(belo).
+recentlyPositive(belo).
