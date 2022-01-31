@@ -7,7 +7,9 @@
 
 :- dynamic traveler/1, partysize/1,
         male/1, female/1,
-        vaccinated/2, vaccine/2.
+        vaccinated/2, vaccine/2,
+        recentlyPositive/1,
+        hasCertificate/1.
 
 
 welcome:- 
@@ -84,7 +86,6 @@ askPositive(Traveler) :-
     read(Responsepositive),
 	nl,
     (
-		(
 			(Responsepositive == yes) -> 
 				assert(recentlyPositive(Traveler)),
 				write('have you recieved a health maintenance organization issued Certificate of Recovery'),
@@ -92,16 +93,10 @@ askPositive(Traveler) :-
 				nl,
 				((Responsecertificate == no) ->
 					write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered'),
-					assert(notRecovered(Traveler))
 				);
 				((Responsecertificate == yes) ->
-					assert(recovered(Traveler)),
+					assert(hasCertificate(Traveler)),
 				)
-		);
-		
-		((Responsepositive == no) ->
-			assert(negative(Traveler)),
-		)
 	).
  
 % Asks for brand and days since last vaccination of traveler
@@ -162,9 +157,16 @@ isolated(Traveler) :-
     travel(Traveler,Country),
     redlist(Country).
 
-% Is traveler considered Recovered?
-considered_recovered(Traveler) :-
-    not()
+% Isolated due to Recently positive AND no Vaccine AND no HMO recovery Certificate
+isolated(Traveler) :-
+    not(has_validvaccine(Traveler)),
+    recentlyPositive(Traveler),
+    not(hasCertificate(Traveler)).
+
+% Considered Recovered due to being recently positive AND has HMO recovery Certificate
+recovered(Traveler) :-
+    hasCertificate(Traveler),
+    recentlyPositive(Travler).
 
 % ---- DICTIONARY ---- %
 
