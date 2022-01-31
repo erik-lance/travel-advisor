@@ -78,7 +78,32 @@ askvaccinated(Traveler) :-
         write('Edi okay')
     ).
 
-
+% Asks if have been tested positive in the past and recovered
+askPositive(Traveler) :-
+    write('Have you tested positive in the recently (10 days)?'),
+    read(Responsepositive),
+	nl,
+    (
+		(
+			(Responsepositive == yes) -> 
+				assert(recentlyPositive(Traveler)),
+				write('have you recieved a health maintenance organization issued Certificate of Recovery'),
+				read(Responsecertificate),
+				nl,
+				((Responsecertificate == no) ->
+					write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered'),
+					assert(notRecovered(Traveler))
+				);
+				((Responsecertificate == yes) ->
+					assert(recovered(Traveler)),
+				)
+		);
+		
+		((Responsepositive == no) ->
+			assert(negative(Traveler)),
+		)
+	).
+ 
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
 askvaccine(Traveler) :-
@@ -136,6 +161,10 @@ isolated(Traveler) :-
     not(has_validvaccine(Traveler)),
     travel(Traveler,Country),
     redlist(Country).
+
+% Is traveler considered Recovered?
+considered_recovered(Traveler) :-
+    not()
 
 % ---- DICTIONARY ---- %
 
