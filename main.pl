@@ -85,15 +85,15 @@ askPositive(Traveler) :-
     read(Responsepositive),
 	nl,
     (
-			(Responsepositive == yes) -> (
-				assert(recentlyPositive(Traveler)),
-				write('have you recieved a health maintenance organization issued Certificate of Recovery'),
-				read(Responsecertificate),
-				nl,
-				((Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
-				 (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
-				)
+        (Responsepositive == yes) -> (
+            assert(recentlyPositive(Traveler)),
+            write('have you recieved a health maintenance organization issued Certificate of Recovery'),
+            read(Responsecertificate),
+            nl,
+            ((Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
+                (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
             )
+        )
 	).
  
 % Asks for brand and days since last vaccination of traveler
@@ -242,7 +242,7 @@ vaccinated(vincent, vaccine(moderna,15)).
 hasCertificate(vincent).
 recentlyPositive(vincent).
 
-% Isolated due to invalid vaccine
+% Isolated due to invalid vaccine (exceeded max days)
 traveler(bulleros).
 male(bulleros).
 vaccinated(bulleros, vaccine(moderna, 189)).
@@ -263,3 +263,7 @@ vaccinated(kate, vaccine(pfizer,3)).
 traveler(belo).
 female(belo).
 recentlyPositive(belo).
+
+% TEST SPUTNIK VACCINE
+traveler(sput).
+vaccinated(sput, vaccine(sputnik, 21)).
