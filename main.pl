@@ -263,7 +263,3 @@ vaccinated(kate, vaccine(pfizer,3)).
 traveler(belo).
 female(belo).
 recentlyPositive(belo).
-
-% TEST SPUTNIK VACCINE
-traveler(sput).
-vaccinated(sput, vaccine(sputnik, 21)).
