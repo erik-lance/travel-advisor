@@ -5,7 +5,7 @@
  * Tiongquico, Erik
 */
 
-:- dynamic traveler/1, 
+:- dynamic traveler/1, partysize/1,
         male/1, female/1,
         vaccinated/2, vaccine/2.
 
@@ -14,6 +14,9 @@ welcome:-
     write('Trip Advisor Agent (TAA) Israel'),
     nl,
     % ask('Would you like to travel to Israel?').
+    write('What is the size of your party? '),
+    read(PartySize), nl,
+    partysize(PartySize),
     profile,
     
     write('Thank you.').
@@ -26,9 +29,12 @@ ask(Question) :-
     write('(yes/no)'),
     read(Response),
     nl,
-    ((Response == yes; Response == y) -> assert(yes(Question));
-     (Response ==  no; Response == n) -> assert(no(Question));
-    write('Sorry. I do not recognize this input.'),fail).
+    (
+        (Response == yes; Response == y) -> assert(yes(Question));
+        (Response ==  no; Response == n) -> assert(no(Question));
+        write('Sorry. I do not recognize this input.'),
+        fail
+    ).
 
 % ---- Questions ---- %
 
@@ -36,22 +42,42 @@ profile :-
     write('What\'s your name? '),
     read(Name),
     assert(traveler(Name)),
-    bioprofile(Name).
+    askpurpose(Name).
+
+askpurpose(Traveler) :-
+    write('What is the purpose of your travel?'),
+    write('(t) Touring/Visiting'),
+    write('(w) Work'),
+    write('(s) School'),
+    read(Response),
+    nl,
+    (
+        (Response == t) -> assert(purpose(Traveler, visiting));
+        (Response == w) -> assert(purpose(Traveler, work));
+        (Response == s) -> assert(purpose(Traveler, school))
+    ),
+    bioprofile(Traveler).
 
 bioprofile(Traveler) :-
     write('Are you male or female? (m/f) '),
     read(Response),
     nl,
-    ((Response == male; Response == m) -> assert(male(Traveler));
-     (Response == female; Response == f) -> assert(female(Traveler));
-    write('Sorry. I do not recognize this input. '), 
-    bioprofile(Traveler) %note: i haven't tried this, it just seemed logical to recurse back to bioprofile if it failed kaso it might ask vaccine pa rin
-    ),
+    (
+        (Response == male;   Response == m) -> (assert(male(Traveler)),   askvaccinated(Traveler));
+        (Response == female; Response == f) -> (assert(female(Traveler)), askvaccinated(Traveler));
+        write('Sorry. I do not recognize this input. '), 
+        bioprofile(Traveler)
+    ).
+    
+askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
     read(VacResponse),
     nl,
-    ((VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
-      write('Edi okay')).
+    (
+        (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
+        write('Edi okay')
+    ).
+
 
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -162,8 +188,6 @@ redlist(us).
 
 % For checking
 list_of_red_countries(RedCountry) :- findall(Country, redlist(Country), RedCountry).
-
-
 
 % If recovered from COVID
 % naatTest(X) :-
