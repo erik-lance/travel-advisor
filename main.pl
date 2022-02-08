@@ -5,7 +5,8 @@
  * Tiongquico, Erik
 */
 
-:- dynamic traveler/1, partysize/1, travel/2,
+:- dynamic traveler/1, travel/2,
+        partysize/1,  numMembers/1,
         male/1, female/1,
         vaccinated/2, vaccine/2,
         recentlyPositive/1,
@@ -19,6 +20,7 @@ welcome:-
     write('What is the size of your party? '),
     read(PartySize), nl,
     assert(partysize(PartySize)),
+    assert(numMembers(1)),
     profile,
     
     write('Thank you.').
@@ -106,6 +108,18 @@ askvaccine(Traveler) :-
     read(ResponseDays),
     nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
+
+checkParty :-
+    partysize(Capacity),
+    numMembers(PartyNum),
+    (
+        (PartyNum < Capacity) -> (
+                                    assert(numMembers+1),
+                                    retract(PartyNum),
+                                    profile
+                                 );
+        write('All members have been checked.')
+    ).
 
 
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
