@@ -1,7 +1,7 @@
 /*
  * MCO3 Travel Advisor Agent
  * Palpallatoc, Aaron
- * Mangoba, Michael
+ * Mangoba, Michael Jhullian
  * Tiongquico, Erik
 */
 
