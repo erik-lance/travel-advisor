@@ -6,11 +6,14 @@
 */
 
 :- dynamic traveler/1, travel/2,
-        partysize/1,  numMembers/1,
+        partysize/1, partyindex/1, memberNum/2,
         male/1, female/1,
         vaccinated/2, vaccine/2,
+        booster/2, boosted/2,
         recentlyPositive/1,
-        hasCertificate/1.
+        hasCertificate/1,
+        minor/1,
+        hasRoundTrip/1, hasMoney/1, hasReservation/1.
 
 
 welcome:- 
@@ -19,13 +22,17 @@ welcome:-
     % ask('Would you like to travel to Israel?').
     write('What is the size of your party? '),
     read(PartySize), nl,
-    assert(partysize(PartySize)),
-    assert(numMembers(1)),
-    profile,
+    (
+      (PartySize > 0, PartySize < 5) -> (
+        assert(partysize(PartySize)),
+        assert(partyindex(1)),
+        profile,    
+        write('Thank you.')                           
+      );
+        write('Sorry, but your party must be at the size of 1-4 only.'),
+        welcome
+    ).
     
-    write('Thank you.').
-
-
 % This will be used for yes/no questions only.
 ask(Question) :-
     write(Question),
@@ -42,9 +49,11 @@ ask(Question) :-
 % ---- Questions ---- %
 
 profile :-
+    partyindex(Index),
     write('What\'s your name? '),
     read(Name),
     assert(traveler(Name)),
+    assert(memberNum(Name,Index)),
     bioprofile(Name).
 
  askpurpose(Traveler) :-
@@ -57,7 +66,9 @@ profile :-
     (
         (Response == t) -> (assert(purpose(Traveler, visiting)), bioprofile(Traveler));
         (Response == w) -> assert(purpose(Traveler, work));
-        (Response == s) -> assert(purpose(Traveler, school))
+        (Response == s) -> assert(purpose(Traveler, school));
+        write('Invalid Input.'),
+        askpurpose(Traveler)
     ).   
 
 bioprofile(Traveler) :-
@@ -67,17 +78,67 @@ bioprofile(Traveler) :-
     (
         (Response == male;   Response == m) -> (assert(male(Traveler)),   askvaccinated(Traveler));
         (Response == female; Response == f) -> (assert(female(Traveler)), askvaccinated(Traveler));
-        write('Sorry. I do not recognize this input. '), 
+        write('Sorry. I do not recognize this input. '),
         bioprofile(Traveler)
     ).
     
+askMinor(Traveler) :-
+    write('What is your current age?'),
+    read(AgeResponse),
+    ( 
+        (AgeResponse < 18) -> 
+        write('Are you accompanied by a Parent?'),
+        read(PResponse),
+        (
+            (PResponse == 'no'; PResponse == 'n') ->
+            assert(minor(Traveler))
+        )
+    ).
+
+askRoundTrip(Traveler) :-
+    write('[yes|no] Do you have a returning ticket(Roundtrip or seperate ticket)?'),
+    read(TicketResponse),
+    (
+        (TicketResponse == 'yes') -> 
+        assert(hasRoundTrip(Traveler))
+    ).
+
+askPocketMoney(Traveler) :-
+    write('[yes|no] Do you have sufficient pocket Money for your trip ($100/day)?'),
+    read(MoneyResponse),
+    (
+        (MoneyResponse == 'yes') ->
+        assert(hasMoney(Travel))    
+    ).
+
+askReservation(Travler) :-
+    write('[yes|no] Do you have reservations for your accomodation during your stay?'),
+    read(HotelResponse),
+    (
+        (MoneyResponse == 'yes') ->
+        assert(hasReservation(Traveler))    
+    ).
+
 askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
     read(VacResponse),
     nl,
     (
+<<<<<<< HEAD
+        (VacResponse == yes; VacResponse == y) -> (
+            askvaccine(Traveler), 
+            write('Have you taken booster shots? (y/n)'),
+            read(BoostResponse), nl,
+            (
+                (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler)
+            )
+        );
+        write('Edi okay'), nl
+=======
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
-        write('Edi okay')
+        write('Edi okay'),
+        nl
+>>>>>>> origin/stable
     ),
     askPositive(Traveler).
 
@@ -99,7 +160,7 @@ askPositive(Traveler) :-
         );
         nl
 	),
-    checkParty.
+    checkParty(Traveler).
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -112,14 +173,25 @@ askvaccine(Traveler) :-
     nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
 
+<<<<<<< HEAD
+askbooster(Traveler) :-
+    write('What is your most recent booster brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj)'),
+    read(ResponseBrand),nl,
+    write('How many days since you last booster shot? '),
+    read(ResponseDays),nl,
+    assert(boosted(Traveler, booster(ResponseBrand, ResponseDay))).
+
 checkParty :-
+=======
+checkParty(Traveler) :-
+>>>>>>> origin/stable
     partysize(Capacity),
-    numMembers(PartyNum),
+    memberNum(Traveler,PartyNum),
     (
         (PartyNum < Capacity) -> (
                                     write('How about the next person?'),
-                                    assert(numMembers(PartyNum+1)),
-                                    retract(numMembers(PartyNum)),
+                                    retract(partyindex(PartyNum)),
+                                    assert(partyindex(PartyNum+1)),
                                     nl,
                                     profile
                                  );
