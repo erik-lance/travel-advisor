@@ -10,7 +10,9 @@
         male/1, female/1,
         vaccinated/2, vaccine/2,
         recentlyPositive/1,
-        hasCertificate/1.
+        hasCertificate/1,
+        minor/1,
+        hasRoundTrip/1, hasMoney/1, hasReservation/1.
 
 
 welcome:- 
@@ -75,10 +77,47 @@ bioprofile(Traveler) :-
     (
         (Response == male;   Response == m) -> (assert(male(Traveler)),   askvaccinated(Traveler));
         (Response == female; Response == f) -> (assert(female(Traveler)), askvaccinated(Traveler));
-        write('Sorry. I do not recognize this input. '), 
+        write('Sorry. I do not recognize this input. '),
         bioprofile(Traveler)
     ).
     
+askMinor(Traveler) :-
+    write('What is your current age?'),
+    read(AgeResponse),
+    ( 
+        (AgeResponse < 18) -> 
+        write('Are you accompanied by a Parent?'),
+        read(PResponse),
+        (
+            (PResponse == 'no'; PResponse == 'n') ->
+            assert(minor(Traveler))
+        )
+    ).
+
+askRoundTrip(Traveler) :-
+    write('[yes|no] Do you have a returning ticket(Roundtrip or seperate ticket)?'),
+    read(TicketResponse),
+    (
+        (TicketResponse == 'yes') -> 
+        assert(hasRoundTrip(Traveler))
+    ).
+
+askPocketMoney(Traveler) :-
+    write('[yes|no] Do you have sufficient pocket Money for your trip ($100/day)?'),
+    read(MoneyResponse),
+    (
+        (MoneyResponse == 'yes') ->
+        assert(hasMoney(Travel))    
+    ).
+
+askReservation(Travler) :-
+    write('[yes|no] Do you have reservations for your accomodation during your stay?'),
+    read(HotelResponse),
+    (
+        (MoneyResponse == 'yes') ->
+        assert(hasReservation(Traveler))    
+    ).
+
 askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
     read(VacResponse),
