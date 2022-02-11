@@ -10,7 +10,8 @@
         male/1, female/1,
         vaccinated/2, vaccine/2,
         recentlyPositive/1,
-        hasCertificate/1.
+        hasCertificate/1,
+        minor/1.
 
 
 welcome:- 
@@ -67,10 +68,23 @@ bioprofile(Traveler) :-
     (
         (Response == male;   Response == m) -> (assert(male(Traveler)),   askvaccinated(Traveler));
         (Response == female; Response == f) -> (assert(female(Traveler)), askvaccinated(Traveler));
-        write('Sorry. I do not recognize this input. '), 
+        write('Sorry. I do not recognize this input. '),
         bioprofile(Traveler)
     ).
     
+askMinor(Traveler) :-
+    write('What is your current age?'),
+    read(AgeResponse),
+    ( 
+        (AgeResponse < 18) -> 
+        write('Are you accompanied by a Parent?'),
+        read(PResponse),
+        (
+            (PResponse == 'no'; PResponse == 'n') ->
+            assert(minor(Traveler))
+        )
+    ).
+
 askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
     read(VacResponse),
