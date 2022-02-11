@@ -92,10 +92,12 @@ askPositive(Traveler) :-
             write('have you recieved a health maintenance organization issued Certificate of Recovery'),
             read(Responsecertificate),
             nl,
-            ((Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
+            (
+                (Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
                 (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
             )
-        )
+        );
+        nl
 	),
     checkParty.
  
@@ -115,8 +117,10 @@ checkParty :-
     numMembers(PartyNum),
     (
         (PartyNum < Capacity) -> (
-                                    assert(numMembers+1),
-                                    retract(PartyNum),
+                                    write('How about the next person?'),
+                                    assert(numMembers(PartyNum+1)),
+                                    retract(numMembers(PartyNum)),
+                                    nl,
                                     profile
                                  );
         write('All members have been checked.')
@@ -243,43 +247,43 @@ list_of_red_countries(RedCountry) :- findall(Country, redlist(Country), RedCount
 
 % PSEUDODATA
 
-% Isolated due to red country
-traveler(mark).
-male(mark).
-vaccinated(mark, vaccine(pfizer,7)).
-travel(mark,philippines).
-travel(mark,switzerland).
+% % Isolated due to red country
+% traveler(mark).
+% male(mark).
+% vaccinated(mark, vaccine(pfizer,7)).
+% travel(mark,philippines).
+% travel(mark,switzerland).
 
-% Not isolated, has valid vaccine and is considered recovered
-traveler(vincent).
-male(vincent).
-vaccinated(vincent, vaccine(moderna,15)).
-hasCertificate(vincent).
-recentlyPositive(vincent).
+% % Not isolated, has valid vaccine and is considered recovered
+% traveler(vincent).
+% male(vincent).
+% vaccinated(vincent, vaccine(moderna,15)).
+% hasCertificate(vincent).
+% recentlyPositive(vincent).
 
-% Isolated due to invalid vaccine (exceeded max days)
-traveler(bulleros).
-male(bulleros).
-vaccinated(bulleros, vaccine(moderna, 189)).
+% % Isolated due to invalid vaccine (exceeded max days)
+% traveler(bulleros).
+% male(bulleros).
+% vaccinated(bulleros, vaccine(moderna, 189)).
 
-% Considered Recovered, has cert while positive
-traveler(martelino).
-male(martelino).
-hasCertificate(martelino).
-recentlyPositive(martelino).
+% % Considered Recovered, has cert while positive
+% traveler(martelino).
+% male(martelino).
+% hasCertificate(martelino).
+% recentlyPositive(martelino).
 
-% Isolated, no valid vaccine
-traveler(kate).
-female(kate).
-vaccinated(kate, vaccine(pfizer,3)).
+% % Isolated, no valid vaccine
+% traveler(kate).
+% female(kate).
+% vaccinated(kate, vaccine(pfizer,3)).
 
-% Isolated, no vaccine, no cert, and is only recently positive.
-% Also not recovered
-traveler(belo).
-female(belo).
-recentlyPositive(belo).
+% % Isolated, no vaccine, no cert, and is only recently positive.
+% % Also not recovered
+% traveler(belo).
+% female(belo).
+% recentlyPositive(belo).
 
-% Vaccine is not part of database of valid vaccines.
-traveler(yuri).
-male(yuri).
-vaccinated(yuri, vaccine(sputnik,14)).
+% % Vaccine is not part of database of valid vaccines.
+% traveler(yuri).
+% male(yuri).
+% vaccinated(yuri, vaccine(sputnik,14)).
