@@ -12,8 +12,7 @@
         recentlyPositive/1,
         hasCertificate/1,
         minor/1,
-        hasRoundTrip/1,
-        hasMoney/1.
+        hasRoundTrip/1, hasMoney/1, hasReservation/1.
 
 
 welcome:- 
@@ -109,6 +108,14 @@ askPocketMoney(Traveler) :-
     (
         (MoneyResponse == 'yes') ->
         assert(hasMoney(Travel))    
+    ).
+
+askReservation(Travler) :-
+    write('[yes|no] Do you have reservations for your accomodation during your stay?'),
+    read(HotelResponse),
+    (
+        (MoneyResponse == 'yes') ->
+        assert(hasReservation(Traveler))    
     ).
 
 askvaccinated(Traveler) :-
