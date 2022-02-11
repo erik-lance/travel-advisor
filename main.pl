@@ -6,9 +6,10 @@
 */
 
 :- dynamic traveler/1, travel/2,
-        partysize/1,  numMembers/1,
+        partysize/1, partyindex/1, memberNum/2,
         male/1, female/1,
         vaccinated/2, vaccine/2,
+        booster/2, boosted/2,
         recentlyPositive/1,
         hasCertificate/1,
         minor/1,
@@ -24,7 +25,7 @@ welcome:-
     (
       (PartySize > 0, PartySize < 5) -> (
         assert(partysize(PartySize)),
-        assert(numMembers(1)),
+        assert(partyindex(1)),
         profile,    
         write('Thank you.')                           
       );
@@ -32,10 +33,6 @@ welcome:-
         welcome
     ).
     
-    
-    
-
-
 % This will be used for yes/no questions only.
 ask(Question) :-
     write(Question),
@@ -52,9 +49,11 @@ ask(Question) :-
 % ---- Questions ---- %
 
 profile :-
+    partyindex(Index),
     write('What\'s your name? '),
     read(Name),
     assert(traveler(Name)),
+    assert(memberNum(Name,Index)),
     bioprofile(Name).
 
  askpurpose(Traveler) :-
@@ -67,7 +66,9 @@ profile :-
     (
         (Response == t) -> (assert(purpose(Traveler, visiting)), bioprofile(Traveler));
         (Response == w) -> assert(purpose(Traveler, work));
-        (Response == s) -> assert(purpose(Traveler, school))
+        (Response == s) -> assert(purpose(Traveler, school));
+        write('Invalid Input.'),
+        askpurpose(Traveler)
     ).   
 
 bioprofile(Traveler) :-
@@ -123,8 +124,18 @@ askvaccinated(Traveler) :-
     read(VacResponse),
     nl,
     (
+        (VacResponse == yes; VacResponse == y) -> (
+            askvaccine(Traveler), 
+            write('Have you taken booster shots? (y/n)'),
+            read(BoostResponse), nl,
+            (
+                (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler)
+            )
+        );
+        write('Edi okay'), nl,
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
-        write('Edi okay')
+        write('Edi okay'),
+        nl
     ),
     askPositive(Traveler).
 
@@ -146,7 +157,7 @@ askPositive(Traveler) :-
         );
         nl
 	),
-    checkParty.
+    checkParty(Traveler).
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -159,14 +170,21 @@ askvaccine(Traveler) :-
     nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
 
-checkParty :-
+askbooster(Traveler) :-
+    write('What is your most recent booster brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj)'),
+    read(ResponseBrand),nl,
+    write('How many days since you last booster shot? '),
+    read(ResponseDays),nl,
+    assert(boosted(Traveler, booster(ResponseBrand, ResponseDay))).
+
+checkParty(Traveler) :-
     partysize(Capacity),
-    numMembers(PartyNum),
+    memberNum(Traveler,PartyNum),
     (
         (PartyNum < Capacity) -> (
                                     write('How about the next person?'),
-                                    assert(numMembers(PartyNum+1)),
-                                    retract(numMembers(PartyNum)),
+                                    retract(partyindex(PartyNum)),
+                                    assert(partyindex(PartyNum+1)),
                                     nl,
                                     profile
                                  );
