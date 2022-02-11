@@ -124,7 +124,6 @@ askvaccinated(Traveler) :-
     read(VacResponse),
     nl,
     (
-<<<<<<< HEAD
         (VacResponse == yes; VacResponse == y) -> (
             askvaccine(Traveler), 
             write('Have you taken booster shots? (y/n)'),
@@ -133,12 +132,10 @@ askvaccinated(Traveler) :-
                 (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler)
             )
         );
-        write('Edi okay'), nl
-=======
+        write('Edi okay'), nl,
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
         write('Edi okay'),
         nl
->>>>>>> origin/stable
     ),
     askPositive(Traveler).
 
@@ -173,7 +170,6 @@ askvaccine(Traveler) :-
     nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
 
-<<<<<<< HEAD
 askbooster(Traveler) :-
     write('What is your most recent booster brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj)'),
     read(ResponseBrand),nl,
@@ -181,10 +177,7 @@ askbooster(Traveler) :-
     read(ResponseDays),nl,
     assert(boosted(Traveler, booster(ResponseBrand, ResponseDay))).
 
-checkParty :-
-=======
 checkParty(Traveler) :-
->>>>>>> origin/stable
     partysize(Capacity),
     memberNum(Traveler,PartyNum),
     (
