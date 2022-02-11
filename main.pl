@@ -20,11 +20,19 @@ welcome:-
     % ask('Would you like to travel to Israel?').
     write('What is the size of your party? '),
     read(PartySize), nl,
-    assert(partysize(PartySize)),
-    assert(numMembers(1)),
-    profile,
+    (
+      (PartySize > 0, PartySize < 5) -> (
+        assert(partysize(PartySize)),
+        assert(numMembers(1)),
+        profile,    
+        write('Thank you.')                           
+      );
+        write('Sorry, but your party must be at the size of 1-4 only.'),
+        welcome
+    ).
     
-    write('Thank you.').
+    
+    
 
 
 % This will be used for yes/no questions only.
