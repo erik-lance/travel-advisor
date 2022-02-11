@@ -96,7 +96,8 @@ askPositive(Traveler) :-
                 (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
             )
         )
-	).
+	),
+    checkParty.
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -155,7 +156,7 @@ checkParty :-
 % X is vaccinated with a valid brand
 has_validvaccine(Traveler) :-
     vaccinated(Traveler,vaccine(VaccineBrand,Days)),
-    validbrand(Vaccinebrand,days(Min, Max)),
+    validbrand(VaccineBrand,days(Min, Max)),
     Days > Min-1,
     Days < Max+1.
 
@@ -277,3 +278,8 @@ vaccinated(kate, vaccine(pfizer,3)).
 traveler(belo).
 female(belo).
 recentlyPositive(belo).
+
+% Vaccine is not part of database of valid vaccines.
+traveler(yuri).
+male(yuri).
+vaccinated(yuri, vaccine(sputnik,14)).
