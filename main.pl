@@ -173,6 +173,21 @@ checkParty :-
         write('All members have been checked.')
     ).
 
+listRequirements(Traveler) :-  
+    write('The Requirements for '), write(Traveler), write(': '), nl, nl,
+    ( 
+        not(hasCertificate(Traveler)) -> 
+        write('HMO issued Certificate of Recovery') 
+    ),
+    (
+        minor(Traveler) -> 
+        write('Letter of Consent to Travel to Israel from Parents'), nl,
+        write('Letter and Proof of Adult supervision while in Israel'), nl
+    ),
+    (
+       not(hasRoundTrip(Traveler)) ->     
+       write('Travel plans after stay (Return Ticket)'), nl
+    ).
 
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
