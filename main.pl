@@ -7,7 +7,7 @@
 
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
-        male/1, female/1,
+        citizen/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         recentlyPositive/1,
@@ -72,14 +72,12 @@ profile :-
     ).   
 
 bioprofile(Traveler) :-
-    write('Are you male or female? (m/f) '),
+    write('Are you an Israeli citizen?'),
     read(Response),
     nl,
     (
-        (Response == male;   Response == m) -> (assert(male(Traveler)),   askvaccinated(Traveler));
-        (Response == female; Response == f) -> (assert(female(Traveler)), askvaccinated(Traveler));
-        write('Sorry. I do not recognize this input. '),
-        bioprofile(Traveler)
+        (Response == yes;   Response == y) -> assert(citizen(Traveler)),
+        askvaccinated(Traveler)
     ).
     
 askMinor(Traveler) :-
