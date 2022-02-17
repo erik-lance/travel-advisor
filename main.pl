@@ -7,7 +7,7 @@
 
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
-        male/1, female/1,
+        citizen/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         recentlyPositive/1,
@@ -72,14 +72,12 @@ profile :-
     ).   
 
 bioprofile(Traveler) :-
-    write('Are you male or female? (m/f) '),
+    write('Are you an Israeli citizen?'),
     read(Response),
     nl,
     (
-        (Response == male;   Response == m) -> (assert(male(Traveler)),   askvaccinated(Traveler));
-        (Response == female; Response == f) -> (assert(female(Traveler)), askvaccinated(Traveler));
-        write('Sorry. I do not recognize this input. '),
-        bioprofile(Traveler)
+        (Response == yes;   Response == y) -> assert(citizen(Traveler)),
+        askvaccinated(Traveler)
     ).
     
 askMinor(Traveler) :-
@@ -124,7 +122,6 @@ askvaccinated(Traveler) :-
     read(VacResponse),
     nl,
     (
-<<<<<<< HEAD
         (VacResponse == yes; VacResponse == y) -> (
             askvaccine(Traveler), 
             write('Have you taken booster shots? (y/n)'),
@@ -133,12 +130,10 @@ askvaccinated(Traveler) :-
                 (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler)
             )
         );
-        write('Edi okay'), nl
-=======
+        write('Edi okay'), nl,
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
         write('Edi okay'),
         nl
->>>>>>> origin/stable
     ),
     askPositive(Traveler).
 
@@ -173,7 +168,6 @@ askvaccine(Traveler) :-
     nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
 
-<<<<<<< HEAD
 askbooster(Traveler) :-
     write('What is your most recent booster brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj)'),
     read(ResponseBrand),nl,
@@ -181,10 +175,7 @@ askbooster(Traveler) :-
     read(ResponseDays),nl,
     assert(boosted(Traveler, booster(ResponseBrand, ResponseDay))).
 
-checkParty :-
-=======
 checkParty(Traveler) :-
->>>>>>> origin/stable
     partysize(Capacity),
     memberNum(Traveler,PartyNum),
     (
@@ -198,6 +189,21 @@ checkParty(Traveler) :-
         write('All members have been checked.')
     ).
 
+listRequirements(Traveler) :-  
+    write('The Requirements for '), write(Traveler), write(': '), nl, nl,
+    ( 
+        not(hasCertificate(Traveler)) -> 
+        write('HMO issued Certificate of Recovery') 
+    ),
+    (
+        minor(Traveler) -> 
+        write('Letter of Consent to Travel to Israel from Parents'), nl,
+        write('Letter and Proof of Adult supervision while in Israel'), nl
+    ),
+    (
+       not(hasRoundTrip(Traveler)) ->     
+       write('Travel plans after stay (Return Ticket)'), nl
+    ).
 
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
