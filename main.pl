@@ -7,7 +7,7 @@
 
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
-        citizen/1,
+        citizen/1, purpose/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         recentlyPositive/1,
@@ -54,9 +54,10 @@ profile :-
     read(Name),
     assert(traveler(Name)),
     assert(memberNum(Name,Index)),
+    askpurpose,
     bioprofile(Name).
 
- askpurpose(Traveler) :-
+ askpurpose :-
     write('What is the purpose of your travel?'),
     write('(t) Touring/Visiting'),
     write('(w) Work'),
@@ -64,11 +65,11 @@ profile :-
     read(Response),
     nl,
     (
-        (Response == t) -> (assert(purpose(Traveler, visiting)), bioprofile(Traveler));
-        (Response == w) -> assert(purpose(Traveler, work));
-        (Response == s) -> assert(purpose(Traveler, school));
+        (Response == t) -> (assert(purpose('visiting')));
+        (Response == w) -> assert(purpose('work'));
+        (Response == s) -> assert(purpose('school'));
         write('Invalid Input.'),
-        askpurpose(Traveler)
+        askpurpose
     ).   
 
 bioprofile(Traveler) :-
