@@ -102,6 +102,7 @@ profile :-
         (purpose('v'), not(noTravel(Name))) -> (
             write('You\'re all clear!')
         );
+        (purpose('v'), noTravel(Name)) -> (printVisitorVisa);
         write('I am sorry, but you can not travel.')
     ),
     checkParty(Name).
@@ -252,7 +253,8 @@ askA1VISA(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == yes; Response == y) -> assert(a1visa(Traveler))
+        (Response == yes; Response == y) -> assert(a1visa(Traveler));
+        printTemporaryResidentVisa
     ).
 
 % Work
@@ -261,7 +263,8 @@ askClergy(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == yes; Response == y) -> assert(clergy(Traveler))
+        (Response == yes; Response == y) -> assert(clergy(Traveler));
+        true
     ).
 
 askB1VISA(Traveler) :-
@@ -269,7 +272,8 @@ askB1VISA(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == yes; Response == y) -> assert(b1visa(Traveler))
+        (Response == yes; Response == y) -> assert(b1visa(Traveler));
+        printWorkVisa
     ).
 
 askA3VISA(Traveler) :-
@@ -277,7 +281,8 @@ askA3VISA(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == yes; Response == y) -> assert(a3visa(Traveler))
+        (Response == yes; Response == y) -> assert(a3visa(Traveler));
+        printClergyVisa
     ).
 
 % Visit (No requirements for now)
