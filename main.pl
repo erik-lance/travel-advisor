@@ -108,7 +108,18 @@ profile :-
     read(Name),
     assert(traveler(Name)),
     assert(memberNum(Name,Index)),
-    bioprofile(Name).
+    bioprofile(Name),
+    (
+        (purpose('r')) -> (
+            write('Returning')
+        );
+        (purpose('w')) -> (
+        write('Working')
+        );
+        (purpose('v')) -> (
+        write('Visiting')
+        )
+    ).
 
 askMinor(Traveler) :-
     write('What is your current age?'),
@@ -139,7 +150,7 @@ passport(Traveler) :-
     (
         (Response == yes; Response == y) -> assert(phpassport(Traveler))
     ),
-    askvaccinated(Traveler).
+    (citizen(Traveler)) -> askvaccinated(Traveler).
 
 askvaccinated(Traveler) :-
     write('Are you vaccinated at 2nd dose? (y/n) '),
