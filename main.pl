@@ -7,13 +7,15 @@
 
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
-        citizen/1, purpose/1,
+        citizen/1, purpose/1, clergy/1,
         phpassport/1, ilpassport/1,
+        a1visa/1, b1visa/1, a3visa/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         exempted/1, noTravel/1,
         hasCertificate/1,
-        minor/1, partyindex/1.
+        minor/1, partyindex/1,
+        flightDays/1, returnDays/1.
 
 
 welcome:- 
@@ -48,14 +50,19 @@ ask(Question, Desc) :-
 
 % ---- Questions for all ---- %
 flight :-
+    write('How many days until your flight?'),
+    read(days),
+    assert(flightDays(days)).
+    /*
     write('What\s the date of your flight?'),
     write('Month: '),
     read(FlightM),
     write('Day: '),
     read(FlightD),
     write('Year: '),
-    read(FlightY).
+    read(FlightY).*/
 
+/*
 arrival :-
     write('What\s the date of your arrival?'),
     write('Month: '),
@@ -63,17 +70,23 @@ arrival :-
     write('Day: '),
     read(FlightD),
     write('Year: '),
-    read(FlightY).
+    read(FlightY).*/
 
 % ---- Note by erik: I think we can use ask() prompt for these. ---- %
 
 return :-
+    write('How many days do you plan to stay?'),
+    read(days),
+    assert(returnDays(days)),
+    nl,
+    ( days =< 90 ) -> assert(purpose(v)).
+    /*
     write('Do you intend to stay longer than 90 days?'),
     read(Response),
     nl,
     (
         (Response == yes; Response == y) -> assert(yes('stay'))
-    ).
+    ).*/
 
 purpose :-
     write('What is the purpose of your travel?'),
@@ -127,8 +140,6 @@ passport(Traveler) :-
         (Response == yes; Response == y) -> assert(phpassport(Traveler))
     ),
     askvaccinated(Traveler).
-
-
 
 askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
@@ -186,8 +197,48 @@ checkParty(Traveler) :-
 % ---- Purpose Requirements ---- %
 
 % Returning
+askILPassport(Traveler) :-
+    write('Do you have your Israeli Passport?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(ilpassport(Traveler))
+    ).
+
+askA1VISA(Traveler) :-
+    write('Do you have an A/1 VISA?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(a1visa(Traveler))
+    ).
+
 % Work
-% Visit
+askClergy(Traveler) :-
+    write('Are you working as a Clergy?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(clergy(Traveler))
+    ).
+
+askB1VISA(Traveler) :-
+    write('Do you have a B/1 VISA?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(b1visa(Traveler))
+    ).
+
+askA3VISA(Traveler) :-
+    write('Do you have an A/3 VISA?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(a3visa(Traveler))
+    ).
+
+% Visit (No requirements for now)
 
 
 
