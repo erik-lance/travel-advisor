@@ -12,8 +12,7 @@
         booster/2, boosted/2,
         recentlyPositive/1,
         hasCertificate/1,
-        minor/1,
-        hasRoundTrip/1, hasMoney/1, hasReservation/1.
+        minor/1, partyindex/1.
 
 
 welcome:- 
@@ -92,30 +91,6 @@ askMinor(Traveler) :-
             (PResponse == 'no'; PResponse == 'n') ->
             assert(minor(Traveler))
         )
-    ).
-
-askRoundTrip(Traveler) :-
-    write('[yes|no] Do you have a returning ticket(Roundtrip or seperate ticket)?'),
-    read(TicketResponse),
-    (
-        (TicketResponse == 'yes') -> 
-        assert(hasRoundTrip(Traveler))
-    ).
-
-askPocketMoney(Traveler) :-
-    write('[yes|no] Do you have sufficient pocket Money for your trip ($100/day)?'),
-    read(MoneyResponse),
-    (
-        (MoneyResponse == 'yes') ->
-        assert(hasMoney(Travel))    
-    ).
-
-askReservation(Travler) :-
-    write('[yes|no] Do you have reservations for your accomodation during your stay?'),
-    read(HotelResponse),
-    (
-        (MoneyResponse == 'yes') ->
-        assert(hasReservation(Traveler))    
     ).
 
 askvaccinated(Traveler) :-
@@ -265,6 +240,7 @@ recovered(Traveler) :-
 % ---- DICTIONARY ---- %
 
 traveldate(
+    flightdate(Month, Day, Year),
     startdate(Month, Day, Year),
     enddate(Month, Day, Year)
 ).
