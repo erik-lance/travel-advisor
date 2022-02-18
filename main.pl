@@ -145,7 +145,7 @@ bioprofile(Traveler) :-
     nl,
     (
         (Response == yes;   Response == y) -> assert(citizen(Traveler))
-    ),
+    );
     passport(Traveler).
     
 passport(Traveler) :-
@@ -155,7 +155,7 @@ passport(Traveler) :-
     (
         (Response == yes; Response == y) -> assert(phpassport(Traveler))
     ),
-    (citizen(Traveler)) -> askvaccinated(Traveler).
+    (not(citizen(Traveler))) -> covidFlow(Traveler).
 
 askvaccinated(Traveler) :-
     write('Are you vaccinated at 2nd dose? (y/n) '),
