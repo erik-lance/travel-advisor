@@ -216,7 +216,7 @@ askfutureBooster(Traveler) :-
     read(ResponseBrand), nl,
     write('How many days from now do you plan to take it?'),
     read(ResponseDays), nl,
-    assert(boosted(Traveler, vaccine(ResponseBrand,-ResponseDays))).
+    assert(boosted(Traveler, booster(ResponseBrand,-ResponseDays))).
 
 checkParty(Traveler) :-
     partysize(Capacity),
