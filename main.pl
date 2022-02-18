@@ -51,8 +51,8 @@ ask(Question, Desc) :-
 % ---- Questions for all ---- %
 flight :-
     write('How many days until your flight?'),
-    read(days),
-    assert(flightDays(days)).
+    read(Days),
+    assert(flightDays(Days)).
     /*
     write('What\s the date of your flight?'),
     write('Month: '),
@@ -76,10 +76,10 @@ arrival :-
 
 return :-
     write('How many days do you plan to stay?'),
-    read(days),
-    assert(returnDays(days)),
+    read(Days),
+    assert(returnDays(Days)),
     nl,
-    ( days =< 90 ) -> assert(purpose(v)).
+    ( Days =< 90 ) -> assert(purpose(v)).
     /*
     write('Do you intend to stay longer than 90 days?'),
     read(Response),
