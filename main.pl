@@ -29,7 +29,7 @@ welcome:-
         assert(partyindex(1)),
         flight,
         return,
-        purpose,
+        ((not(purpose('v'))) -> purpose);
         profile,    
         write('Thank you.')                           
       );
@@ -86,6 +86,7 @@ profile :-
     assert(traveler(Name)),
     assert(memberNum(Name,Index)),
     bioprofile(Name),
+    passport(Name),
     (
         (purpose('r')) -> (
             ((citizen(Name)) -> askILPassport(Name);
@@ -101,7 +102,8 @@ profile :-
         (purpose('v')) -> (
             write('You\'re all clear!')
         )
-    ).
+    ),
+    checkParty(Name).
 
 askMinor(Traveler) :-
     write('What is your current age?'),
@@ -122,8 +124,7 @@ bioprofile(Traveler) :-
     nl,
     (
         (Response == yes;   Response == y) -> assert(citizen(Traveler))
-    );
-    passport(Traveler).
+    ).
     
 passport(Traveler) :-
     write('Do you have a Philippine Passport?'),
