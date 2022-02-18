@@ -111,13 +111,18 @@ profile :-
     bioprofile(Name),
     (
         (purpose('r')) -> (
-            write('Returning')
+            ((citizen(Name)) -> askILPassport(Name);
+             askA1VISA(Name)
+            )
         );
         (purpose('w')) -> (
-        write('Working')
+            askClergy(Name),
+            ((clergy(Name)) -> askA3VISA(Name);
+             askB1VISA(Name)
+            )
         );
         (purpose('v')) -> (
-        write('Visiting')
+            write('You\'re all clear!')
         )
     ).
 
