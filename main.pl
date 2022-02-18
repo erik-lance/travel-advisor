@@ -8,6 +8,7 @@
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
         citizen/1, purpose/1,
+        phpassport/1, ilpassport/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         recentlyPositive/1,
@@ -66,20 +67,24 @@ arrival :-
 
 % ---- Note by erik: I think we can use ask() prompt for these. ---- %
 
-israeliCitizenship :-
-    write('Does your party have an Israeli citizenship?'),
-    read(Response),
-    nl,
-    (
-        (Response == yes; Response == y) -> assert(yes('citizen'))
-    ).
-
 return :-
     write('Do you intend to stay longer than 90 days?'),
     read(Response),
     nl,
     (
         (Response == yes; Response == y) -> assert(yes('stay'))
+    ).
+
+purpose :-
+    write('What is the purpose of your travel?'),
+    write('(w) work'),
+    write('(r) returning resident'),
+    read(Response), 
+    nl,
+    (
+        (Response == w; Response == r) -> assert(purpose(Response));
+        write('Invalid input. Please try again.'),
+        purpose
     ).
 
 % ---- Questions ---- %
@@ -90,33 +95,8 @@ profile :-
     read(Name),
     assert(traveler(Name)),
     assert(memberNum(Name,Index)),
-    askpurpose,
     bioprofile(Name).
 
- askpurpose :-
-    write('What is the purpose of your travel?'),
-    write('(t) Touring/Visiting'),
-    write('(w) Work'),
-    write('(s) School'),
-    read(Response),
-    nl,
-    (
-        (Response == t) -> (assert(purpose('visiting')));
-        (Response == w) -> assert(purpose('work'));
-        (Response == s) -> assert(purpose('school'));
-        write('Invalid Input.'),
-        askpurpose
-    ).   
-
-bioprofile(Traveler) :-
-    write('Are you an Israeli citizen?'),
-    read(Response),
-    nl,
-    (
-        (Response == yes;   Response == y) -> assert(citizen(Traveler)),
-        askvaccinated(Traveler)
-    ).
-    
 askMinor(Traveler) :-
     write('What is your current age?'),
     read(AgeResponse),
@@ -129,6 +109,26 @@ askMinor(Traveler) :-
             assert(minor(Traveler))
         )
     ).
+
+bioprofile(Traveler) :-
+    write('Do you have an Israeli citizenship?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes;   Response == y) -> assert(citizen(Traveler))
+    ),
+    passport(Traveler).
+    
+passport(Traveler) :-
+    write('Do you have a Philippine Passport?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(phpassport(Traveler))
+    ),
+    askvaccinated(Traveler).
+
+
 
 askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
@@ -202,6 +202,14 @@ checkParty(Traveler) :-
         write('All members have been checked.')
     ).
 
+% ---- Purpose Requirements ---- %
+
+% Returning
+% Work
+% Visit
+
+
+
 listRequirements(Traveler) :-  
     write('The Requirements for '), write(Traveler), write(': '), nl, nl,
     ( 
@@ -212,10 +220,6 @@ listRequirements(Traveler) :-
         minor(Traveler) -> 
         write('Letter of Consent to Travel to Israel from Parents'), nl,
         write('Letter and Proof of Adult supervision while in Israel'), nl
-    ),
-    (
-       not(hasRoundTrip(Traveler)) ->     
-       write('Travel plans after stay (Return Ticket)'), nl
     ).
 
 redList(Traveler) :-
