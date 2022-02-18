@@ -29,7 +29,9 @@ welcome:-
         assert(partyindex(1)),
         flight,
         return,
-        ((not(purpose('v'))) -> purpose);
+        ((not(purpose('v'))) -> purpose;
+         true
+        ),
         profile,    
         write('Thank you.')                           
       );
@@ -63,7 +65,10 @@ return :-
     read(Days),
     assert(returnDays(Days)),
     nl,
-    ( Days =< 90 ) -> assert(purpose(v)).
+    (
+        ( Days =< 90 ) -> assert(purpose(v));
+        true
+    ).
 
 purpose :-
     write('What is the purpose of your travel?'),
@@ -85,6 +90,7 @@ profile :-
     read(Name),
     assert(traveler(Name)),
     assert(memberNum(Name,Index)),
+    askMinor(Name),
     bioprofile(Name),
     passport(Name),
     (
@@ -111,13 +117,14 @@ askMinor(Traveler) :-
     write('What is your current age?'),
     read(AgeResponse),
     ( 
-        (AgeResponse < 18) -> 
-        write('Are you accompanied by a Parent?'),
-        read(PResponse),
-        (
-            (PResponse == 'no'; PResponse == 'n') ->
-            assert(minor(Traveler))
-        )
+        (AgeResponse < 18) -> (write('Are you accompanied by a Parent?'),
+            read(PResponse),
+            (
+                (PResponse == 'no'; PResponse == 'n') -> assert(minor(Traveler))
+                % hi gian ano ibig sabihin nito thx
+            )
+        );
+        true
     ).
 
 bioprofile(Traveler) :-
