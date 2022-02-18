@@ -151,24 +151,14 @@ askvaccinated(Traveler) :-
     askPositive(Traveler).
 
 % Asks if have been tested positive in the past and recovered
-askPositive(Traveler) :-
-    write('Have you tested positive in the recently (10 days)?'),
-    read(Responsepositive),
-	nl,
+askCertificate(Traveler) :-
+    assert(recentlyPositive(Traveler)),
+    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
+    read(Responsecertificate),
+    nl,
     (
-        (Responsepositive == yes) -> (
-            assert(recentlyPositive(Traveler)),
-            write('have you recieved a health maintenance organization issued Certificate of Recovery'),
-            read(Responsecertificate),
-            nl,
-            (
-                (Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
-                (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
-            )
-        );
-        nl
-	),
-    checkParty(Traveler).
+        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
+    ).
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -226,6 +216,13 @@ covidFlow(Traveler) :-
     redList(Traveler),
     ( (redlist(Traveler)) ->
         askExemption(Traveler)
+    );
+    (
+        askvaccinated(Traveler)
+    ),
+    (
+        (not(has_validvaccine(Traveler))) ->
+        askCertificate(Traveler)
     ).
 
 askExemption(Traveler) :-
