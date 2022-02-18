@@ -206,7 +206,7 @@ listRequirements(Traveler) :-
     write('The Requirements for '), write(Traveler), write(': '), nl, nl,
     ( 
         not(hasCertificate(Traveler)) -> 
-        write('HMO issued Certificate of Recovery') 
+        write('European HMO issued Certificate of Recovery') 
     ),
     (
         minor(Traveler) -> 
@@ -216,6 +216,21 @@ listRequirements(Traveler) :-
     (
        not(hasRoundTrip(Traveler)) ->     
        write('Travel plans after stay (Return Ticket)'), nl
+    ).
+
+redList(Traveler) :-
+    write('How many countries have you visited in the last 14 days? (Not including Philippines)'), nl,
+    read(Number),
+    ( (Number > 0) ->
+        listCountry(Traveler, Number)
+    ).
+
+listCountry(Traveler, Number) :-
+    write('Please Input a Country you have gone to: '), nl,
+    read(Country),
+    assert(travel(Traveler, Country)),
+    ((Number - 1 > 0) -> 
+        listCountry(Traveler, Number - 1)
     ).
 
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
@@ -272,7 +287,8 @@ isolated(Traveler) :-
 % Considered Recovered due to being recently positive AND has HMO recovery Certificate
 recovered(Traveler) :-
     hasCertificate(Traveler),
-    recentlyPositive(Traveler).
+    recentlyPositive(Traveler),
+    has_validvaccine(Traveler).
 
 % ---- DICTIONARY ---- %
 
