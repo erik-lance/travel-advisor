@@ -301,14 +301,14 @@ askExemption(Traveler) :-
     ).
 
 redList(Traveler) :-
-    write('How many countries have you visited in the last 14 days? (0 if none)'), nl,
+    write('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)'), nl,
     read(Number),
     ( (Number > 0) ->
         listCountry(Traveler, Number)
     ).
 
 listCountry(Traveler, Number) :-
-    write('Please Input a Country you have gone to: '), nl,
+    write('Input Said Country: '), nl,
     read(Country),
     assert(travel(Traveler, Country)),
     ((Number - 1 > 0) -> 
