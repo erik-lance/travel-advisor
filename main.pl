@@ -12,7 +12,7 @@
         a1visa/1, b1visa/1, a3visa/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
-        recentlyPositive/1,
+        exempted/1, noTravel,
         hasCertificate/1,
         minor/1, partyindex/1.
 
@@ -146,28 +146,17 @@ askvaccinated(Traveler) :-
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
         write('Edi okay'),
         nl
-    ),
-    askPositive(Traveler).
+    ).
 
 % Asks if have been tested positive in the past and recovered
-askPositive(Traveler) :-
-    write('Have you tested positive in the recently (10 days)?'),
-    read(Responsepositive),
-	nl,
+askCertificate(Traveler) :-
+    assert(recentlyPositive(Traveler)),
+    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
+    read(Responsecertificate),
+    nl,
     (
-        (Responsepositive == yes) -> (
-            assert(recentlyPositive(Traveler)),
-            write('have you recieved a health maintenance organization issued Certificate of Recovery'),
-            read(Responsecertificate),
-            nl,
-            (
-                (Responsecertificate == no) -> write('Please acquire a HMO issued Certificate of Recovery before going to Israel to be recognized as recovered');
-                (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
-            )
-        );
-        nl
-	),
-    checkParty(Traveler).
+        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
+    ).
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -261,8 +250,36 @@ listRequirements(Traveler) :-
         write('Letter and Proof of Adult supervision while in Israel'), nl
     ).
 
+covidFlow(Traveler) :- 
+    redList(Traveler),
+    ( redlist(Traveler) ->
+        askExemption(Traveler)
+    );
+    (
+        askvaccinated(Traveler)
+    ),
+    (
+        (not(has_validvaccine(Traveler))) ->
+        askCertificate(Traveler)
+    ).
+
+askExemption(Traveler) :-
+    write('[yes/no]Do you have exceptional entry permission from the Population and Immigration Authority of Israel?'), nl,
+    read(Response),
+    (
+    (Response == 'yes') ->
+        assert(exempted(Traveler))
+    );
+    (Response == 'no' ->
+        assert(noTravel(Traveler))
+    );
+    (
+        write('Wrong input, valid inputs are [yes/no]'), nl,
+        askExemption(Traveler)
+    ).
+
 redList(Traveler) :-
-    write('How many countries have you visited in the last 14 days? (Not including Philippines)'), nl,
+    write('How many countries have you visited in the last 14 days? (0 if none)'), nl,
     read(Number),
     ( (Number > 0) ->
         listCountry(Traveler, Number)
@@ -323,14 +340,12 @@ isolated(Traveler) :-
     redlist(Country).
 
 % Isolated due to Recently positive AND no Vaccine AND no HMO recovery Certificate
-isolated(Traveler) :-
-    recentlyPositive(Traveler),
+isolated(Traveler) :- 
     not(hasCertificate(Traveler)).
 
 % Considered Recovered due to being recently positive AND has HMO recovery Certificate
 recovered(Traveler) :-
     hasCertificate(Traveler),
-    recentlyPositive(Traveler),
     has_validvaccine(Traveler).
 
 % ---- DICTIONARY ---- %
