@@ -7,8 +7,9 @@
 
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
-        citizen/1, purpose/1,
+        citizen/1, purpose/1, clergy/1,
         phpassport/1, ilpassport/1,
+        a1visa/1, b1visa/1, a3visa/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         recentlyPositive/1,
@@ -128,8 +129,6 @@ passport(Traveler) :-
     ),
     askvaccinated(Traveler).
 
-
-
 askvaccinated(Traveler) :-
     write('Are you vaccinated? (y/n) '),
     read(VacResponse),
@@ -205,8 +204,48 @@ checkParty(Traveler) :-
 % ---- Purpose Requirements ---- %
 
 % Returning
+askILPassport(Traveler) :-
+    write('Do you have your Israeli Passport?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(ilpassport(Traveler))
+    ).
+
+askA1VISA(Traveler) :-
+    write('Do you have an A/1 VISA?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(a1visa(Traveler))
+    ).
+
 % Work
-% Visit
+askClergy(Traveler) :-
+    write('Are you working as a Clergy?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(clergy(Traveler))
+    ).
+
+askB1VISA(Traveler) :-
+    write('Do you have a B/1 VISA?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(b1visa(Traveler))
+    ).
+
+askA3VISA(Traveler) :-
+    write('Do you have an A/3 VISA?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(a3visa(Traveler))
+    ).
+
+% Visit (No requirements for now)
 
 
 
