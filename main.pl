@@ -17,7 +17,6 @@
         minor/1, partyindex/1,
         flightDays/1, returnDays/1.
 
-
 welcome:- 
     write('Trip Advisor Agent (TAA) Israel'),
     nl,
@@ -28,6 +27,9 @@ welcome:-
       (PartySize > 0, PartySize < 5) -> (
         assert(partysize(PartySize)),
         assert(partyindex(1)),
+        flight,
+        return,
+        purpose,
         profile,    
         write('Thank you.')                           
       );
@@ -53,24 +55,6 @@ flight :-
     write('How many days until your flight?'),
     read(Days),
     assert(flightDays(Days)).
-    /*
-    write('What\s the date of your flight?'),
-    write('Month: '),
-    read(FlightM),
-    write('Day: '),
-    read(FlightD),
-    write('Year: '),
-    read(FlightY).*/
-
-/*
-arrival :-
-    write('What\s the date of your arrival?'),
-    write('Month: '),
-    read(FlightM),
-    write('Day: '),
-    read(FlightD),
-    write('Year: '),
-    read(FlightY).*/
 
 % ---- Note by erik: I think we can use ask() prompt for these. ---- %
 
@@ -80,13 +64,6 @@ return :-
     assert(returnDays(Days)),
     nl,
     ( Days =< 90 ) -> assert(purpose(v)).
-    /*
-    write('Do you intend to stay longer than 90 days?'),
-    read(Response),
-    nl,
-    (
-        (Response == yes; Response == y) -> assert(yes('stay'))
-    ).*/
 
 purpose :-
     write('What is the purpose of your travel?'),
