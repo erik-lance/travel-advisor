@@ -12,7 +12,7 @@
         a1visa/1, b1visa/1, a3visa/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
-        exempted/1, noTravel/1,
+        noTravel/1, yesTravel/1,
         hasCertificate/1,
         minor/1, partyindex/1,
         flightDays/1, returnDays/1.
@@ -51,8 +51,8 @@ ask(Question, Desc) :-
 % ---- Questions for all ---- %
 flight :-
     write('How many days until your flight?'),
-    read(days),
-    assert(flightDays(days)).
+    read(Days),
+    assert(flightDays(Days)).
     /*
     write('What\s the date of your flight?'),
     write('Month: '),
@@ -76,10 +76,10 @@ arrival :-
 
 return :-
     write('How many days do you plan to stay?'),
-    read(days),
-    assert(returnDays(days)),
+    read(Days),
+    assert(returnDays(Days)),
     nl,
-    ( days =< 90 ) -> assert(purpose(v)).
+    ( Days =< 90 ) -> assert(purpose(v)).
     /*
     write('Do you intend to stay longer than 90 days?'),
     read(Response),
@@ -293,16 +293,20 @@ listRequirements(Traveler) :-
     ).
 
 covidFlow(Traveler) :- 
-    redList(Traveler),
-    ( redlist(Traveler) ->
-        askExemption(Traveler)
-    );
+    (
+        redList(Traveler),
+        redlist(Traveler) ->
+            askExemption(Traveler)
+    ),
     (
         (not(noTravel(Traveler))) ->
         askvaccinated(Traveler),
         (
             (not(has_validvaccine(Traveler))) ->
-            askCertificate(Traveler)
+                askCertificate(Traveler)
+        );
+        (   (has_validvaccine(Traveler)) ->
+                assert(yesTravel(Traveler))
         )
     ).
 
@@ -313,7 +317,7 @@ askCertificate(Traveler) :-
     read(Responsecertificate),
     nl,
     (
-        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
+        (Responsecertificate == yes) -> assert(yesTravel(Traveler))
     );
     (
         (Responsecertificate == no) -> askExemption(Traveler)
@@ -324,7 +328,7 @@ askExemption(Traveler) :-
     read(Response),
     (
     (Response == yes) ->
-        assert(exempted(Traveler))
+        assert(yesTravel(Traveler))
     );
     (Response == no ->
         assert(noTravel(Traveler))
