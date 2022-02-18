@@ -33,16 +33,53 @@ welcome:-
     ).
     
 % This will be used for yes/no questions only.
-ask(Question) :-
+ask(Question, Desc) :-
     write(Question),
     write('(yes/no)'),
     read(Response),
     nl,
     (
-        (Response == yes; Response == y) -> assert(yes(Question));
-        (Response ==  no; Response == n) -> assert(no(Question));
+        (Response == yes; Response == y) -> assert(yes(Desc));
+        (Response ==  no; Response == n) -> assert(no(Desc));
         write('Sorry. I do not recognize this input.'),
         fail
+    ).
+
+% ---- Questions for all ---- %
+flight :-
+    write('What\s the date of your flight?'),
+    write('Month: '),
+    read(FlightM),
+    write('Day: '),
+    read(FlightD),
+    write('Year: '),
+    read(FlightY).
+
+arrival :-
+    write('What\s the date of your arrival?'),
+    write('Month: '),
+    read(FlightM),
+    write('Day: '),
+    read(FlightD),
+    write('Year: '),
+    read(FlightY).
+
+% ---- Note by erik: I think we can use ask() prompt for these. ---- %
+
+israeliCitizenship :-
+    write('Does your party have an Israeli citizenship?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(yes('citizen'))
+    ).
+
+return :-
+    write('Do you intend to stay longer than 90 days?'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(yes('stay'))
     ).
 
 % ---- Questions ---- %
