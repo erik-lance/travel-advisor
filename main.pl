@@ -11,7 +11,7 @@
         phpassport/1, ilpassport/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
-        exempted/1, noTravel,
+        exempted/1, noTravel/1,
         hasCertificate/1,
         minor/1, partyindex/1.
 
@@ -149,15 +149,7 @@ askvaccinated(Traveler) :-
         nl
     ).
 
-% Asks if have been tested positive in the past and recovered
-askCertificate(Traveler) :-
-    assert(recentlyPositive(Traveler)),
-    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
-    read(Responsecertificate),
-    nl,
-    (
-        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
-    ).
+
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -217,21 +209,35 @@ covidFlow(Traveler) :-
         askExemption(Traveler)
     );
     (
-        askvaccinated(Traveler)
-    ),
+        (not(noTravel(Traveler))) ->
+        askvaccinated(Traveler),
+        (
+            (not(has_validvaccine(Traveler))) ->
+            askCertificate(Traveler)
+        )
+    ).
+
+% Asks if have been tested positive in the past and recovered
+askCertificate(Traveler) :-
+    assert(recentlyPositive(Traveler)),
+    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
+    read(Responsecertificate),
+    nl,
     (
-        (not(has_validvaccine(Traveler))) ->
-        askCertificate(Traveler)
+        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
+    );
+    (
+        (Responsecertificate == no) -> askExemption(Traveler)
     ).
 
 askExemption(Traveler) :-
     write('[yes/no]Do you have exceptional entry permission from the Population and Immigration Authority of Israel?'), nl,
     read(Response),
     (
-    (Response == 'yes') ->
+    (Response == yes) ->
         assert(exempted(Traveler))
     );
-    (Response == 'no' ->
+    (Response == no ->
         assert(noTravel(Traveler))
     );
     (
