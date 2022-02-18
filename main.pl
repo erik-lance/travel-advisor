@@ -370,6 +370,13 @@ printClergyVisa() :-
     write('     Payment Fee for Visa'), nl,
     write('     Two passport picture (5x5)'), nl,
     write('     Invitation from recognized religious Institute'), nl.
+
+printTemporaryResidentVisa() :-
+    write('To be applicable for a temporary Resident Visa one the following must be met'), nl,
+    write('     A jew returning to Israel after being away or whose ancestors were away from Israel'), nl,
+    write('     A person born from a Jewish Mother'), nl,
+    write('     A convert to Judaism and not a member of any other religion'), nl,
+    write('For more requirements, please contact the Israel Ministry of Interior')
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
 % This will be used for questions that prompt specific words or answers e.g. nationality
