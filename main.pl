@@ -88,20 +88,21 @@ profile :-
     bioprofile(Name),
     passport(Name),
     (
-        (purpose('r')) -> (
+        (purpose('r'), not(noTravel(Name))) -> (
             ((citizen(Name)) -> askILPassport(Name);
              askA1VISA(Name)
             )
         );
-        (purpose('w')) -> (
+        (purpose('w'), not(noTravel(Name))) -> (
             askClergy(Name),
             ((clergy(Name)) -> askA3VISA(Name);
              askB1VISA(Name)
             )
         );
-        (purpose('v')) -> (
+        (purpose('v'), not(noTravel(Name))) -> (
             write('You\'re all clear!')
-        )
+        );
+        write('I am sorry, but you can not travel.')
     ),
     checkParty(Name).
 
@@ -123,7 +124,8 @@ bioprofile(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == yes;   Response == y) -> assert(citizen(Traveler))
+        (Response == yes;   Response == y) -> assert(citizen(Traveler));
+        true
     ).
     
 passport(Traveler) :-
@@ -131,9 +133,12 @@ passport(Traveler) :-
     read(Response),
     nl,
     (
-        (Response == yes; Response == y) -> assert(phpassport(Traveler))
+        (Response == yes; Response == y) -> assert(phpassport(Traveler));
+        true
     ),
-    (not(citizen(Traveler))) -> covidFlow(Traveler).
+    ((not(citizen(Traveler))) -> covidFlow(Traveler);
+     true
+     ).
 
 askvaccinated(Traveler) :-
     write('Are you vaccinated at 2nd dose? (y/n) '),
@@ -145,7 +150,8 @@ askvaccinated(Traveler) :-
             write('Have you taken booster shots? (y/n)'),
             read(BoostResponse), nl,
             (
-                (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler)
+                (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler);
+                true
             )
         );
 
@@ -160,12 +166,16 @@ askvaccinated(Traveler) :-
                     nl,
                     (
                         (FutureBoost == yes; FutureBoost == y) -> askfutureBooster(Traveler);
-                        write('Alright! Note, if you plan to travel half a year or so from your vaccination, you might need a booster.')
+                        write('Alright! Note, if you plan to travel half a year or so from your vaccination, you might need a booster.'),
+                        true
                     )
                 );
-                write('I am sorry, but you are not allowed to travel')
+                write('I am sorry, but you are not allowed to travel'),
+                true
             )
-        )
+        );
+
+        true
     ).
 
 % Asks if have been tested positive in the past and recovered
@@ -289,19 +299,20 @@ listRequirements(Traveler) :-
 covidFlow(Traveler) :- 
     (
         redListPrompt(Traveler),
-        redlist(Traveler) ->
-            askExemption(Traveler)
+        (   has_travelredlist(Traveler) -> askExemption(Traveler);
+            true
+        )
     ),
     (
-        (not(noTravel(Traveler))) ->
-        askvaccinated(Traveler),
+        (not(noTravel(Traveler))) -> askvaccinated(Traveler),
         (
-            (not(has_validvaccine(Traveler))) ->
-                askCertificate(Traveler)
+            (not(has_validvaccine(Traveler))) -> askCertificate(Traveler);
+            true
         );
-        (   (has_validvaccine(Traveler)) ->
-                assert(yesTravel(Traveler))
-        )
+        (   (has_validvaccine(Traveler)) ->assert(yesTravel(Traveler));
+            true
+        );
+        true
     ).
 
 % Asks if have been tested positive in the past and recovered
@@ -321,30 +332,28 @@ askExemption(Traveler) :-
     write('[yes/no]Do you have exceptional entry permission from the Population and Immigration Authority of Israel?'), nl,
     read(Response),
     (
-    (Response == yes) ->
-        assert(yesTravel(Traveler))
-    );
-    (Response == no ->
-        assert(noTravel(Traveler))
-    );
-    (
-        write('Wrong input, valid inputs are [yes/no]'), nl,
-        askExemption(Traveler)
+        (Response == yes) -> assert(yesTravel(Traveler));
+        (Response == no) -> assert(noTravel(Traveler));
+        (
+            write('Wrong input, valid inputs are [yes/no]'), nl,
+            askExemption(Traveler),
+            true
+        )
     ).
 
 redListPrompt(Traveler) :-
     write('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)'), nl,
     read(Number),
-    ( (Number > 0) ->
-        listCountry(Traveler, Number)
+    ( (Number > 0) -> listCountry(Traveler, Number);
+      true
     ).
 
 listCountry(Traveler, Number) :-
     write('Input Said Country: '), nl,
     read(Country),
     assert(travel(Traveler, Country)),
-    ((Number - 1 > 0) -> 
-        listCountry(Traveler, Number - 1)
+    (   (Number - 1 > 0) -> listCountry(Traveler, Number - 1);
+        true
     ).
 
 printWorkVisa() :-
@@ -377,7 +386,7 @@ printTemporaryResidentVisa() :-
     write('     A jew returning to Israel after being away or whose ancestors were away from Israel'), nl,
     write('     A person born from a Jewish Mother'), nl,
     write('     A convert to Judaism and not a member of any other religion'), nl,
-    write('For more requirements, please contact the Israel Ministry of Interior')
+    write('For more requirements, please contact the Israel Ministry of Interior').
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
 % This will be used for questions that prompt specific words or answers e.g. nationality
@@ -414,6 +423,10 @@ has_validvaccine(Traveler) :-
     validbrand(VaccineBrand,days(Min, Max)),
     Days > Min-1,
     Days < Max+1.
+
+has_travelredlist(Traveler) :-
+    travel(Traveler,Country),
+    redlist(Country).
 
 % Isolation due to invalid vaccine (be it by brand or days vaccinated)
 isolated(Traveler) :- not(has_validvaccine(Traveler)).
