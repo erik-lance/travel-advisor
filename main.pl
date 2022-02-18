@@ -12,7 +12,7 @@
         a1visa/1, b1visa/1, a3visa/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
-        exempted/1, noTravel/1,
+        noTravel/1, yesTravel/1,
         hasCertificate/1,
         minor/1, partyindex/1,
         flightDays/1, returnDays/1.
@@ -255,16 +255,20 @@ listRequirements(Traveler) :-
     ).
 
 covidFlow(Traveler) :- 
-    redList(Traveler),
-    ( redlist(Traveler) ->
-        askExemption(Traveler)
-    );
+    (
+        redList(Traveler),
+        redlist(Traveler) ->
+            askExemption(Traveler)
+    ),
     (
         (not(noTravel(Traveler))) ->
         askvaccinated(Traveler),
         (
             (not(has_validvaccine(Traveler))) ->
-            askCertificate(Traveler)
+                askCertificate(Traveler)
+        );
+        (   (has_validvaccine(Traveler)) ->
+                assert(yesTravel(Traveler))
         )
     ).
 
@@ -275,7 +279,7 @@ askCertificate(Traveler) :-
     read(Responsecertificate),
     nl,
     (
-        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
+        (Responsecertificate == yes) -> assert(yesTravel(Traveler))
     );
     (
         (Responsecertificate == no) -> askExemption(Traveler)
@@ -286,7 +290,7 @@ askExemption(Traveler) :-
     read(Response),
     (
     (Response == yes) ->
-        assert(exempted(Traveler))
+        assert(yesTravel(Traveler))
     );
     (Response == no ->
         assert(noTravel(Traveler))
