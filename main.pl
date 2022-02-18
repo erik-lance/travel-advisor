@@ -142,7 +142,7 @@ passport(Traveler) :-
     askvaccinated(Traveler).
 
 askvaccinated(Traveler) :-
-    write('Are you vaccinated? (y/n) '),
+    write('Are you vaccinated at 2nd dose? (y/n) '),
     read(VacResponse),
     nl,
     (
@@ -154,13 +154,35 @@ askvaccinated(Traveler) :-
                 (BoostResponse == yes; BoostResponse == y) -> askbooster(Traveler)
             )
         );
-        write('Edi okay'), nl,
-        (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
-        write('Edi okay'),
-        nl
+
+        (VacResponse == no; VacResponse == n) -> (
+            write('Do you plan to get your second dose in the future days?'),
+            read(FutureVac),
+            (
+                (FutureVac == yes; FutureVac == y) -> (
+                    askfutureVaccine(Traveler),
+                    write('Do you also plan to get a booster?'),
+                    read(FutureBoost),
+                    nl,
+                    (
+                        (FutureBoost == yes; FutureBoost == y) -> askfutureBooster(Traveler);
+                        write('Alright! Note, if you plan to travel half a year or so from your vaccination, you might need a booster.')
+                    )
+                );
+                write('I am sorry, but you are not allowed to travel')
+            )
+        )
     ).
 
-
+% Asks if have been tested positive in the past and recovered
+askCertificate(Traveler) :-
+    assert(recentlyPositive(Traveler)),
+    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
+    read(Responsecertificate),
+    nl,
+    (
+        (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
+    ).
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -178,7 +200,23 @@ askbooster(Traveler) :-
     read(ResponseBrand),nl,
     write('How many days since you last booster shot? '),
     read(ResponseDays),nl,
-    assert(boosted(Traveler, booster(ResponseBrand, ResponseDay))).
+    assert(boosted(Traveler, booster(ResponseBrand, ResponseDays))).
+
+askfutureVaccine(Traveler) :-
+    write('What vaccine brand do you plan to take?'),
+    write('Note: if J&J, type jj.'),
+    read(ResponseBrand), nl,
+    write('How many days from now do you plan to take it?'),
+    read(ResponseDays), nl,
+    assert(vaccinated(Traveler, vaccine(ResponseBrand,-ResponseDays))).
+
+askfutureBooster(Traveler) :-
+    write('What booster brand do you plan to take?'),
+    write('Note: if J&J, type jj.'),
+    read(ResponseBrand), nl,
+    write('How many days from now do you plan to take it?'),
+    read(ResponseDays), nl,
+    assert(boosted(Traveler, vaccine(ResponseBrand,-ResponseDays))).
 
 checkParty(Traveler) :-
     partysize(Capacity),
