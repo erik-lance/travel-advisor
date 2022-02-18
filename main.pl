@@ -147,8 +147,7 @@ askvaccinated(Traveler) :-
         (VacResponse == yes; VacResponse == y) -> askvaccine(Traveler);
         write('Edi okay'),
         nl
-    ),
-    askPositive(Traveler).
+    ).
 
 % Asks if have been tested positive in the past and recovered
 askCertificate(Traveler) :-
@@ -214,7 +213,7 @@ listRequirements(Traveler) :-
 
 covidFlow(Traveler) :- 
     redList(Traveler),
-    ( (redlist(Traveler)) ->
+    ( redlist(Traveler) ->
         askExemption(Traveler)
     );
     (
@@ -226,7 +225,7 @@ covidFlow(Traveler) :-
     ).
 
 askExemption(Traveler) :-
-    write('[yes/no]Do you have exceptional entry permission from the Population and Immigration Authority of Israel?') nl,
+    write('[yes/no]Do you have exceptional entry permission from the Population and Immigration Authority of Israel?'), nl,
     read(Response),
     (
     (Response == 'yes') ->
@@ -302,14 +301,12 @@ isolated(Traveler) :-
     redlist(Country).
 
 % Isolated due to Recently positive AND no Vaccine AND no HMO recovery Certificate
-isolated(Traveler) :-
-    recentlyPositive(Traveler),
+isolated(Traveler) :- 
     not(hasCertificate(Traveler)).
 
 % Considered Recovered due to being recently positive AND has HMO recovery Certificate
 recovered(Traveler) :-
     hasCertificate(Traveler),
-    recentlyPositive(Traveler),
     has_validvaccine(Traveler).
 
 % ---- DICTIONARY ---- %
