@@ -10,7 +10,7 @@
         citizen/1, purpose/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
-        recentlyPositive/1,
+        exempted/1, noTravel,
         hasCertificate/1,
         minor/1, partyindex/1.
 
@@ -175,14 +175,31 @@ listRequirements(Traveler) :-
         minor(Traveler) -> 
         write('Letter of Consent to Travel to Israel from Parents'), nl,
         write('Letter and Proof of Adult supervision while in Israel'), nl
-    ),
+    ).
+
+covidFlow(Traveler) :- 
+    redList(Traveler),
+    ( (redlist(Traveler)) ->
+        askExemption(Traveler)
+    ).
+
+askExemption(Traveler) :-
+    write('[yes/no]Do you have exceptional entry permission from the Population and Immigration Authority of Israel?') nl,
+    read(Response),
     (
-       not(hasRoundTrip(Traveler)) ->     
-       write('Travel plans after stay (Return Ticket)'), nl
+    (Response == 'yes') ->
+        assert(exempted(Traveler))
+    );
+    (Response == 'no' ->
+        assert(noTravel(Traveler))
+    );
+    (
+        write('Wrong input, valid inputs are [yes/no]'), nl,
+        askExemption(Traveler)
     ).
 
 redList(Traveler) :-
-    write('How many countries have you visited in the last 14 days? (Not including Philippines)'), nl,
+    write('How many countries have you visited in the last 14 days? (0 if none)'), nl,
     read(Number),
     ( (Number > 0) ->
         listCountry(Traveler, Number)
