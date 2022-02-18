@@ -185,6 +185,7 @@ redList(Traveler) :-
     write('How many countries have you visited in the last 14 days? (Not including Philippines)'), nl,
     read(Number),
     ( (Number > 0) ->
+        listCountry(Traveler, Number)
     ).
 
 listCountry(Traveler, Number) :-
@@ -193,7 +194,7 @@ listCountry(Traveler, Number) :-
     assert(travel(Traveler, Country)),
     ((Number - 1 > 0) -> 
         listCountry(Traveler, Number - 1)
-    )
+    ).
 
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
