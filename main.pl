@@ -14,7 +14,8 @@
         booster/2, boosted/2,
         exempted/1, noTravel,
         hasCertificate/1,
-        minor/1, partyindex/1.
+        minor/1, partyindex/1,
+        flightDays/1, returnDays/1.
 
 
 welcome:- 
@@ -49,14 +50,19 @@ ask(Question, Desc) :-
 
 % ---- Questions for all ---- %
 flight :-
+    write('How many days until your flight?'),
+    read(days),
+    assert(flightDays(days)).
+    /*
     write('What\s the date of your flight?'),
     write('Month: '),
     read(FlightM),
     write('Day: '),
     read(FlightD),
     write('Year: '),
-    read(FlightY).
+    read(FlightY).*/
 
+/*
 arrival :-
     write('What\s the date of your arrival?'),
     write('Month: '),
@@ -64,17 +70,23 @@ arrival :-
     write('Day: '),
     read(FlightD),
     write('Year: '),
-    read(FlightY).
+    read(FlightY).*/
 
 % ---- Note by erik: I think we can use ask() prompt for these. ---- %
 
 return :-
+    write('How many days do you plan to stay?'),
+    read(days),
+    assert(returnDays(days)),
+    nl,
+    ( days =< 90 ) -> assert(purpose(v)).
+    /*
     write('Do you intend to stay longer than 90 days?'),
     read(Response),
     nl,
     (
         (Response == yes; Response == y) -> assert(yes('stay'))
-    ).
+    ).*/
 
 purpose :-
     write('What is the purpose of your travel?'),
