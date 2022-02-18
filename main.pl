@@ -287,7 +287,7 @@ listRequirements(Traveler) :-
 
 covidFlow(Traveler) :- 
     (
-        redList(Traveler),
+        redListPrompt(Traveler),
         redlist(Traveler) ->
             askExemption(Traveler)
     ),
@@ -331,7 +331,7 @@ askExemption(Traveler) :-
         askExemption(Traveler)
     ).
 
-redList(Traveler) :-
+redListPrompt(Traveler) :-
     write('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)'), nl,
     read(Number),
     ( (Number > 0) ->
