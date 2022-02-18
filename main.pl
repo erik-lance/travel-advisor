@@ -203,7 +203,7 @@ askvaccine(Traveler) :-
 askbooster(Traveler) :-
     write('What is your most recent booster brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj)'),
     read(ResponseBrand),nl,
-    write('How many days since you last booster shot? '),
+    write('How many days since your last booster shot? '),
     read(ResponseDays),nl,
     assert(boosted(Traveler, booster(ResponseBrand, ResponseDays))).
 
