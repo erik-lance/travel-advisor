@@ -7,13 +7,12 @@
 
 :- dynamic traveler/1, travel/2,
         partysize/1, partyindex/1, memberNum/2,
-        citizen/1,
+        citizen/1, purpose/1,
         vaccinated/2, vaccine/2,
         booster/2, boosted/2,
         recentlyPositive/1,
         hasCertificate/1,
-        minor/1,
-        hasRoundTrip/1, hasMoney/1, hasReservation/1.
+        minor/1, partyindex/1.
 
 
 welcome:- 
@@ -54,9 +53,10 @@ profile :-
     read(Name),
     assert(traveler(Name)),
     assert(memberNum(Name,Index)),
+    askpurpose,
     bioprofile(Name).
 
- askpurpose(Traveler) :-
+ askpurpose :-
     write('What is the purpose of your travel?'),
     write('(t) Touring/Visiting'),
     write('(w) Work'),
@@ -64,11 +64,11 @@ profile :-
     read(Response),
     nl,
     (
-        (Response == t) -> (assert(purpose(Traveler, visiting)), bioprofile(Traveler));
-        (Response == w) -> assert(purpose(Traveler, work));
-        (Response == s) -> assert(purpose(Traveler, school));
+        (Response == t) -> (assert(purpose('visiting')));
+        (Response == w) -> assert(purpose('work'));
+        (Response == s) -> assert(purpose('school'));
         write('Invalid Input.'),
-        askpurpose(Traveler)
+        askpurpose
     ).   
 
 bioprofile(Traveler) :-
@@ -91,30 +91,6 @@ askMinor(Traveler) :-
             (PResponse == 'no'; PResponse == 'n') ->
             assert(minor(Traveler))
         )
-    ).
-
-askRoundTrip(Traveler) :-
-    write('[yes|no] Do you have a returning ticket(Roundtrip or seperate ticket)?'),
-    read(TicketResponse),
-    (
-        (TicketResponse == 'yes') -> 
-        assert(hasRoundTrip(Traveler))
-    ).
-
-askPocketMoney(Traveler) :-
-    write('[yes|no] Do you have sufficient pocket Money for your trip ($100/day)?'),
-    read(MoneyResponse),
-    (
-        (MoneyResponse == 'yes') ->
-        assert(hasMoney(Travel))    
-    ).
-
-askReservation(Travler) :-
-    write('[yes|no] Do you have reservations for your accomodation during your stay?'),
-    read(HotelResponse),
-    (
-        (MoneyResponse == 'yes') ->
-        assert(hasReservation(Traveler))    
     ).
 
 askvaccinated(Traveler) :-
@@ -279,6 +255,7 @@ recovered(Traveler) :-
 % ---- DICTIONARY ---- %
 
 traveldate(
+    flightdate(Month, Day, Year),
     startdate(Month, Day, Year),
     enddate(Month, Day, Year)
 ).
