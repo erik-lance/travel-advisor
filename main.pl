@@ -348,21 +348,28 @@ listCountry(Traveler, Number) :-
 
 printWorkVisa() :-
     write('Requirements for Working Visa: '), nl,
+    write('     Completed Application for Work Visa found in Government website'), nl,
     write('     Verified Certificate of good Conduct '), nl,
     write('     Medical Certificate from recognized institutions'), nl,
     write('     Consent for Finger print scand and Photograph'), nl,
-    write('     Completed Application for Work Visa found in Government website'), nl,
     write('     Payment Free for Visa'), nl,
     write('Please email the Israel Ministry of Interior for possible other requirements'), nl.
 
-printTouristVisa() :-
-    write('Requirements for Tourist Visa:'), nl,
+printVisitorVisa() :-
+    write('Requirements for Visitor Visa:'), nl,
     write('     Completed Application for Visitor Visa found in Government website'), nl,
     write('     A photocopy of travel documents'), nl,
     write('     Proof of financial means (bank statements from last 3 months)'), nl,
     write('     Order for round trip airline tickets from and to Israel'), nl,
     write('     Two passport pictures (5x5)'), nl,
     write('     Payment Fee for Visa'), nl.
+
+printClergyVisa() :-
+    write('Requirements for Clergy Visa'), nl,
+    write('     Completed Application for Clergy Visa found in Government website'), nl,
+    write('     Payment Fee for Visa'), nl,
+    write('     Two passport picture (5x5)'), nl,
+    write('     Invitation from recognized religious Institute'), nl.
 % ------------------- IGNORE EVERYTHING BETWEEN FOR NOW ------------------- %
 
 % This will be used for questions that prompt specific words or answers e.g. nationality
