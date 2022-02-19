@@ -109,7 +109,8 @@ profile :-
             write('You\'re all clear!')
         );
         (purpose('v'), noTravel(Name)) -> (printVisitorVisa);
-        write('I am sorry, but you can not travel.')
+        format('I am sorry ~w, but you can not travel', [Traveler])
+        % write('I am sorry, but you can not travel.')
     ),
     checkParty(Name).
 
@@ -178,7 +179,8 @@ askvaccinated(Traveler) :-
                         true
                     )
                 );
-                write('I am sorry, but you are not allowed to travel'),
+                format('I am sorry ~w, but you can not travel', [Traveler])
+                % write('I am sorry, but you are not allowed to travel'),
                 true
             )
         );
