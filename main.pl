@@ -108,7 +108,7 @@ profile :-
         (yes(Name,'citizen')) -> true
     ),
     (
-        (purpose('r'), covid_result(Name)) -> (
+        (purpose('r'), covid_result(Name) ; yes(Name,'citizen')) -> (
             (
                 (yes(Name,'citizen')) -> 
                                         (
@@ -125,7 +125,7 @@ profile :-
             )
         );
 
-        (purpose('w'),  covid_result(Name)) -> 
+        (purpose('w'),  covid_result(Name) ; yes(Name,'citizen')) -> 
         (
             ask(Name, 'Are you working as a Clergy?','clergy'),
             (
@@ -146,7 +146,7 @@ profile :-
             write('You are all set!'),nl
         );
 
-        (purpose('v'), no(Name,'citizen'), not(covid_result(Name))) -> (
+        (purpose('v')) -> (
             printVisitorVisa,
             format('I am sorry ~w, but you can not travel', [Name]),  nl
         );
