@@ -121,7 +121,7 @@ profile :-
                                          
                                          (    can_travel(Name))  -> write('You are all set!');
                                          (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
-                                            rite('You need to provide a valid proof of your Israeli Citizenship.'), nl
+                                            write('You need to provide a valid proof of your Israeli Citizenship.'), nl
                                                 
                                             
                                         );
