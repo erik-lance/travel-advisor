@@ -113,9 +113,15 @@ profile :-
                 (yes(Name,'citizen')) -> 
                                         (
                                          ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
-                                         ask(Name, 'Do you have an A/1 VISA?',           'a1visa')
+                                         ask(Name, 'Do you have an A/1 VISA?',           'a1visa'),
+                                         (    can_travel(Name))  -> write('You are all set!');
+                                         (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                                            (
+                                                no(Name,'ilpassport') -> write('You need to provide a valid proof of your Israeli Citizenship.'), nl;
+                                                no(Name,'a1visa')     -> printTemporaryResidentVisa()
+                                            )
                                         );
-                ( no(Name,'citizen')) -> true
+                ( no(Name,'citizen')) -> format('I am sorry, ~w, but you do not have any proof of your Israeli Citizenship.', [Name]), nl
             )
         );
 
@@ -123,19 +129,29 @@ profile :-
         (
             ask(Name, 'Are you working as a Clergy?','clergy'),
             (
-                (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa'),
+                (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa');
                 ( no(Name,'clergy')) -> ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
+            ),
+            (
+                can_travel(Name) -> write('You are all set!');
+                (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                (
+                    (yes(Name,'clergy'), no(Name,'a3visa')) -> printClergyVisa;
+                    ( no(Name,'clergy'), no(Name,'b1visa')) -> printWorkVisa
+                )    
             )
         );
 
-        (purpose('v'),  covid_result(Name)) -> (
-            write('You\'re all clear!')
+        (purpose('v'),  yes(Name,'citizen') ; covid_result(Name)) -> (
+            write('You are all set!'),nl
         );
 
-        (purpose('v'), not(covid_result(Name))) -> (
+        (purpose('v'), no(Name,'citizen'), not(covid_result(Name))) -> (
             printVisitorVisa,
-            format('I am sorry ~w, but you can not travel', [Traveler])
-        )
+            format('I am sorry ~w, but you can not travel', [Name]),  nl
+        );
+
+        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements.', [Traveler]), nl
     ),
     checkParty(Name).
 
