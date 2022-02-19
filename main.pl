@@ -109,7 +109,8 @@ profile :-
             write('You\'re all clear!')
         );
         (purpose('v'), noTravel(Name)) -> (printVisitorVisa);
-        write('I am sorry, but you can not travel.')
+        format('I am sorry ~w, but you can not travel', [Traveler])
+        % write('I am sorry, but you can not travel.')
     ),
     checkParty(Name).
 
@@ -178,16 +179,17 @@ askvaccinated(Traveler) :-
                         true
                     )
                 );
-                write('I am sorry, but you are not allowed to travel'),
+                format('I am sorry ~w, but you can not travel', [Traveler]),
+                % write('I am sorry, but you are not allowed to travel'),
                 true
             )
         );
 
         true
     ).
-
+% Duplicate to 
 % Asks if have been tested positive in the past and recovered
-askCertificate(Traveler) :-
+/* askCertificate(Traveler) :-
     assert(recentlyPositive(Traveler)),
     write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
     read(Responsecertificate),
@@ -195,6 +197,7 @@ askCertificate(Traveler) :-
     (
         (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
     ).
+*/
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
