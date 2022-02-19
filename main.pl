@@ -336,9 +336,19 @@ has_validvaccine(Traveler) :-
     Days > Min-1,
     Days < Max+1.
 
+has_validvaccine(Traveler) :-
+    boosted(Traveler,booster(VaccineBrand,Days)),
+    validbrand(VaccineBrand,days(Min, _)),
+    Days > Min-1.
+
 % This is for cases where only pre-flight is relevant.
 has_valid_preflightvaccine(Traveler) :-
     vaccinated(Traveler,vaccine(VaccineBrand,Days)),
+    validbrand(VaccineBrad,days(Min,_)),
+    Days > Min-1.
+
+has_valid_preflightvaccine(Traveler) :-
+    boosted(Traveler,booster(VaccineBrand,Days)),
     validbrand(VaccineBrad,days(Min,_)),
     Days > Min-1.
 
