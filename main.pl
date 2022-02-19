@@ -40,7 +40,7 @@ welcome:-
     
 % This will be used for yes/no questions only.
 ask(Traveler, Question, Desc) :-
-    write(Question),
+    write(Question), nl,
     write(' (yes/no) or (y/n)'),
     read(Response),
     nl,
@@ -48,7 +48,7 @@ ask(Traveler, Question, Desc) :-
         (Response == yes; Response == y) -> assert(yes(Traveler, Desc));
         (Response ==  no; Response == n) -> assert(no(Traveler, Desc));
         (
-            write('Sorry. I do not recognize this input.'),
+            write('Sorry. I do not recognize this input. '),
             ask(Traveler, Question, Desc)
         )
     ).
