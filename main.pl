@@ -173,8 +173,8 @@ askMinor(Traveler) :-
         (AgeResponse < 18) -> (write('Are you accompanied by a Parent?'),
             read(PResponse),
             (
-                (PResponse == 'no'; PResponse == 'n') -> assert(minor(Traveler))
-                % hi gian ano ibig sabihin nito thx
+                (PResponse == 'no'; PResponse == 'n') -> assert(minor(Traveler));
+                true
             )
         );
         (AgeResponse >= 18) -> true
@@ -333,24 +333,31 @@ printTemporaryResidentVisa() :-
 has_validvaccine(Traveler) :-
     vaccinated(Traveler,vaccine(VaccineBrand,Days)),
     validbrand(VaccineBrand,days(Min, Max)),
-    Days > Min-1,
-    Days < Max+1.
+    flightDays(FDays),
+    returnDays(RDays),
+    CalibDays = FDays + Days,
+    CalibDays > Min-1,
+    CalibDays+RDays < Max+1.
 
 has_validvaccine(Traveler) :-
     boosted(Traveler,booster(VaccineBrand,Days)),
     validbrand(VaccineBrand,days(Min, _)),
-    Days > Min-1.
+    flightDays(FDays),
+    CalibDays = FDays + Days,
+    CalibDays > Min-1.
 
 % This is for cases where only pre-flight is relevant.
 has_valid_preflightvaccine(Traveler) :-
     vaccinated(Traveler,vaccine(VaccineBrand,Days)),
     validbrand(VaccineBrad,days(Min,_)),
-    Days > Min-1.
+    flightDays(FDays),
+    FDays + Days > Min-1.
 
 has_valid_preflightvaccine(Traveler) :-
     boosted(Traveler,booster(VaccineBrand,Days)),
     validbrand(VaccineBrad,days(Min,_)),
-    Days > Min-1.
+    flightDays(FDays),
+    FDays + Days > Min-1.
 
 % Checks if traveler has visited a red list country
 has_travelredlist(Traveler) :-
@@ -402,10 +409,6 @@ can_travel(Traveler) :-
 % ---- DICTIONARY ---- %
 
 list_of_travels(X,TravelList) :- findall(Country, travel(X,Country), TravelList).
-
-% Profile of User
-
-% Purposes
 
 % COVID tests
 
