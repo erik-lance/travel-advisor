@@ -14,6 +14,7 @@
         flightDays/1, returnDays/1,
 
         asknum/2,
+        yes/1, no/1,
         yes/2, no/2.
 
 welcome:- 
@@ -27,10 +28,6 @@ welcome:-
         assert(partyindex(1)),
         flight,
         return,
-        (
-            not(purpose('v')) -> purpose;
-               (purpose('v')) -> true
-        ),
         profile,    
         write('Thank you.')                           
       );
@@ -38,7 +35,21 @@ welcome:-
         welcome
     ).
     
-% This will be used for yes/no questions only.
+% Thes will be used for yes/no questions only.
+ask(Question, Desc) :-
+    write(Question), nl,
+    write(' (yes/no) or (y/n)'),
+    read(Response),
+    nl,
+    (
+        (Response == yes; Response == y) -> assert(yes(Desc));
+        (Response ==  no; Response == n) -> assert(no(Desc));
+        (
+            write('Sorry. I do not recognize this input. '),
+            ask(Traveler, Question, Desc)
+        )
+    ).
+
 ask(Traveler, Question, Desc) :-
     write(Question), nl,
     write(' (yes/no) or (y/n)'),
@@ -72,24 +83,18 @@ flight :-
     assert(flightDays(Days)).
 
 return :-
-    asknum('How many days do you plan to stay?', Days),
-    assert(returnDays(Days)),
-    nl,
-    (
-        ( Days =< 90 ) -> assert(purpose(v));
-        ( Days  > 90 ) -> write('This means you are no longer elligible for a tourist VISA. It is only elligible for those staying below 90 days.'), nl
-    ).
-
-purpose :-
-    write('What is the purpose of your travel?'), nl,
-    write('(w) work'),nl,
-    write('(r) returning resident'),nl,
-    read(Response), 
-    nl,
-    (
-        (Response == w; Response == r) -> assert(purpose(Response));
-        write('Invalid input. Please try again.'),
-        purpose
+    ask('Is your stay temporary?','stay'),
+    (   
+        yes('stay') -> (
+            asknum('How many days do you plan to stay?', Days),
+            assert(returnDays(Days)),
+            nl,
+            (
+                ( Days =< 90 ) -> assert(purpose(v));
+                ( Days  > 90 ) -> write('This means you are no longer elligible for a tourist VISA. It is only elligible for those staying below 90 days.'), nl, purpose(w)
+            )
+        );
+        no('stay') -> assert(purpose(r))
     ).
 
 % ---- Questions ---- %
@@ -113,15 +118,20 @@ profile :-
                 (yes(Name,'citizen')) -> 
                                         (
                                          ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
-                                         ask(Name, 'Do you have an A/1 VISA?',           'a1visa'),
+                                         
                                          (    can_travel(Name))  -> write('You are all set!');
                                          (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
-                                            (
-                                                no(Name,'ilpassport') -> write('You need to provide a valid proof of your Israeli Citizenship.'), nl;
-                                                no(Name,'a1visa')     -> printTemporaryResidentVisa()
-                                            )
+                                            rite('You need to provide a valid proof of your Israeli Citizenship.'), nl
+                                                
+                                            
                                         );
-                ( no(Name,'citizen')) -> format('I am sorry, ~w, but you do not have any proof of your Israeli Citizenship.', [Name]), nl
+                ( no(Name,'citizen')) -> (
+                    ask(Name, 'Do you have an A/1 VISA?',           'a1visa'),
+                    (
+                        can_travel(Name) -> write('You are all set!');
+                        not(can_travel(Name)) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl, printTemporaryResidentVisa()
+                    )
+                )
             )
         );
 
