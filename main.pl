@@ -12,15 +12,15 @@
         noTravel/1, yesTravel/1,
         minor/1, partyindex/1,
         flightDays/1, returnDays/1,
-        
+
+        asknum/2,
         yes/2, no/2.
 
 welcome:- 
     write('Trip Advisor Agent (TAA) Israel'),
     nl,
     % ask('Would you like to travel to Israel?').
-    write('What is the size of your party? '),
-    read(PartySize), nl,
+    asknum('What is the size of your party? ', PartySize), nl,
     (
       (PartySize > 0, PartySize < 5) -> (
         assert(partysize(PartySize)),
@@ -34,7 +34,7 @@ welcome:-
         profile,    
         write('Thank you.')                           
       );
-        write('Sorry, but your party must be at the size of 1-4 only.'),
+        write('Sorry, but your party must be at the size of 1-4 only.'),nl,
         welcome
     ).
     
@@ -53,15 +53,26 @@ ask(Traveler, Question, Desc) :-
         )
     ).
 
+% This will be used for numerical questions only.
+% The number inputted will be stored to Answer variable.
+asknum(Question, Answer) :-
+    write(Question), nl,
+    read(Response), nl,
+    (
+        (integer(Response)) -> Response = Answer;
+        (
+            write('Please input a number.'),nl,
+            asknum(Question, Answer)
+        )   
+    ).
+
 % ---- Questions for all ---- %
 flight :-
-    write('How many days until your flight?'),
-    read(Days),
+    asknum('How many days until your flight? ', Days),
     assert(flightDays(Days)).
 
 return :-
-    write('How many days do you plan to stay?'),
-    read(Days),
+    asknum('How many days do you plan to stay?', Days),
     assert(returnDays(Days)),
     nl,
     (
@@ -131,8 +142,7 @@ profile :-
 % Returning
 
 askMinor(Traveler) :-
-    write('What is your current age?'),
-    read(AgeResponse),
+    asknum('What is your current age? ', AgeResponse),
     ( 
         (AgeResponse < 18) -> (write('Are you accompanied by a Parent?'),
             read(PResponse),
@@ -187,34 +197,29 @@ askvaccinated(Traveler) :-
 % Note: edit for booster eventually.
 askvaccine(Traveler) :-
     write('What is your most recent vaccine brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj) '), nl,
-    read(ResponseBrand),
-    nl,
-    write('How many days since your last vaccination? '),
-    read(ResponseDays),
-    nl,
+    read(ResponseBrand), nl,
+    asknum('How many days since your last vaccination? ', ResponseDays), nl,
     assert(vaccinated(Traveler,vaccine(ResponseBrand,ResponseDays))).
 
 askbooster(Traveler) :-
     write('What is your most recent booster brand? (pfizer/moderna/astrazeneca/sinovac/sinopharm/jj)'), nl,
-    read(ResponseBrand),nl,
-    write('How many days since your last booster shot? '),
-    read(ResponseDays),nl,
+    read(ResponseBrand), nl,
+    asknum('How many days since your last booster shot? ',ResponseDays), nl,
     assert(boosted(Traveler, booster(ResponseBrand, ResponseDays))).
 
 askfutureVaccine(Traveler) :-
     write('What vaccine brand do you plan to take?'),
     write('Note: if J&J, type jj.'),
     read(ResponseBrand), nl,
-    write('How many days from now do you plan to take it?'),
-    read(ResponseDays), nl,
+    asknum('How many days from now do you plan to take it? ', ResponseDays), nl,
     assert(vaccinated(Traveler, vaccine(ResponseBrand,-ResponseDays))).
 
 askfutureBooster(Traveler) :-
     write('What booster brand do you plan to take?'),
     write('Note: if J&J, type jj.'),
     read(ResponseBrand), nl,
-    write('How many days from now do you plan to take it?'),
-    read(ResponseDays), nl,
+    asknum('How many days from now do you plan to take it? ',
+    ResponseDays), nl,
     assert(boosted(Traveler, booster(ResponseBrand,-ResponseDays))).
 
 checkParty(Traveler) :-
