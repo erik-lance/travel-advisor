@@ -71,9 +71,9 @@ return :-
     ).
 
 purpose :-
-    write('What is the purpose of your travel?'),
-    write('(w) work'),
-    write('(r) returning resident'),
+    write('What is the purpose of your travel?'), nl,
+    write('(w) work'),nl,
+    write('(r) returning resident'),nl,
     read(Response), 
     nl,
     (
@@ -109,7 +109,8 @@ profile :-
             write('You\'re all clear!')
         );
         (purpose('v'), noTravel(Name)) -> (printVisitorVisa);
-        write('I am sorry, but you can not travel.')
+        format('I am sorry ~w, but you can not travel', [Traveler])
+        % write('I am sorry, but you can not travel.')
     ),
     checkParty(Name).
 
@@ -178,16 +179,17 @@ askvaccinated(Traveler) :-
                         true
                     )
                 );
-                write('I am sorry, but you are not allowed to travel'),
+                format('I am sorry ~w, but you can not travel', [Traveler]),
+                % write('I am sorry, but you are not allowed to travel'),
                 true
             )
         );
 
         true
     ).
-
+% Duplicate to 
 % Asks if have been tested positive in the past and recovered
-askCertificate(Traveler) :-
+/* askCertificate(Traveler) :-
     assert(recentlyPositive(Traveler)),
     write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
     read(Responsecertificate),
@@ -195,6 +197,7 @@ askCertificate(Traveler) :-
     (
         (Responsecertificate == yes) -> assert(hasCertificate(Traveler))
     ).
+*/
  
 % Asks for brand and days since last vaccination of traveler
 % Note: edit for booster eventually.
@@ -316,7 +319,7 @@ covidFlow(Traveler) :-
         )
     ),
     (
-        (not(noTravel(Traveler))) -> askvaccinated(Traveler),
+        (not(noTravel(Traveler)), not(yesTravel(Traveler))) -> askvaccinated(Traveler),
         (
             (not(has_validvaccine(Traveler))) -> askCertificate(Traveler);
             true
@@ -330,14 +333,13 @@ covidFlow(Traveler) :-
 % Asks if have been tested positive in the past and recovered
 askCertificate(Traveler) :-
     assert(recentlyPositive(Traveler)),
-    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
+    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'), nl,
     read(Responsecertificate),
     nl,
     (
-        (Responsecertificate == yes) -> assert(yesTravel(Traveler))
-    );
-    (
-        (Responsecertificate == no) -> askExemption(Traveler)
+        (Responsecertificate == yes) -> assert(yesTravel(Traveler));
+        (Responsecertificate == no) -> askExemption(Traveler);
+        true
     ).
 
 askExemption(Traveler) :-
