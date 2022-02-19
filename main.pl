@@ -333,7 +333,7 @@ covidFlow(Traveler) :-
 % Asks if have been tested positive in the past and recovered
 askCertificate(Traveler) :-
     assert(recentlyPositive(Traveler)),
-    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'),
+    write('have you recieved a health maintenance organization issued Certificate of Recovery from the european union'), nl,
     read(Responsecertificate),
     nl,
     (
