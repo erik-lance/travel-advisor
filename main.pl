@@ -86,7 +86,7 @@ return :-
     ask('Is your stay temporary?','stay'),
     (   
         yes('stay') -> (
-            asknum('How many days do you plan to stay?', Days),
+            asknum('How many days do you approximately plan to stay?', Days),
             assert(returnDays(Days)),
             nl,
             (
@@ -113,7 +113,7 @@ profile :-
         (yes(Name,'citizen')) -> true
     ),
     (
-        (purpose('r'), covid_result(Name) ; yes(Name,'citizen')) -> (
+        (purpose('r'), (covid_result(Name) ; has_valid_preflightvaccine(Name)) ; yes(Name,'citizen')) -> (
             (
                 (yes(Name,'citizen')) -> 
                                         (
@@ -335,6 +335,12 @@ has_validvaccine(Traveler) :-
     validbrand(VaccineBrand,days(Min, Max)),
     Days > Min-1,
     Days < Max+1.
+
+% This is for cases where only pre-flight is relevant.
+has_valid_preflightvaccine(Traveler) :-
+    vaccinated(Traveler,vaccine(VaccineBrand,Days)),
+    validbrand(VaccineBrad,days(Min,_)),
+    Days > Min-1.
 
 % Checks if traveler has visited a red list country
 has_travelredlist(Traveler) :-
