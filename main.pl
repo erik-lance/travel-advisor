@@ -335,16 +335,14 @@ has_validvaccine(Traveler) :-
     validbrand(VaccineBrand,days(Min, Max)),
     flightDays(FDays),
     returnDays(RDays),
-    CalibDays = FDays + Days,
-    CalibDays > Min-1,
-    CalibDays+RDays < Max+1.
+    Days + FDays > Min-1,
+    Days + FDays + RDays < Max+1.
 
 has_validvaccine(Traveler) :-
     boosted(Traveler,booster(VaccineBrand,Days)),
     validbrand(VaccineBrand,days(Min, _)),
     flightDays(FDays),
-    CalibDays = FDays + Days,
-    CalibDays > Min-1.
+    Days + FDays > Min-1.
 
 % This is for cases where only pre-flight is relevant.
 has_valid_preflightvaccine(Traveler) :-
