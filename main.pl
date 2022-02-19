@@ -319,7 +319,7 @@ covidFlow(Traveler) :-
         )
     ),
     (
-        (not(noTravel(Traveler))) -> askvaccinated(Traveler),
+        (not(noTravel(Traveler)), not(yesTravel(Traveler))) -> askvaccinated(Traveler),
         (
             (not(has_validvaccine(Traveler))) -> askCertificate(Traveler);
             true
@@ -337,10 +337,9 @@ askCertificate(Traveler) :-
     read(Responsecertificate),
     nl,
     (
-        (Responsecertificate == yes) -> assert(yesTravel(Traveler))
-    );
-    (
-        (Responsecertificate == no) -> askExemption(Traveler)
+        (Responsecertificate == yes) -> assert(yesTravel(Traveler));
+        (Responsecertificate == no) -> askExemption(Traveler);
+        true
     ).
 
 askExemption(Traveler) :-
