@@ -99,8 +99,12 @@ profile :-
     (
         (purpose('r'), covid_result(Name)) -> (
             (
-                (yes(Name,'citizen')) -> ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
+                (yes(Name,'citizen')) -> 
+                                        (
+                                         ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
                                          ask(Name, 'Do you have an A/1 VISA?',           'a1visa')
+                                        );
+                ( no(Name,'citizen')) -> true
             )
         );
 
@@ -109,7 +113,7 @@ profile :-
             ask(Name, 'Are you working as a Clergy?','clergy'),
             (
                 (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa'),
-                                        ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
+                ( no(Name,'clergy')) -> ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
             )
         );
 
@@ -224,7 +228,7 @@ checkParty(Traveler) :-
                                     nl,
                                     profile
                                  );
-        write('All members have been checked.')
+        (PartyNum >= Capacity) -> write('All members have been checked.')
     ).
 
 covidFlow(Traveler) :- 
@@ -328,6 +332,25 @@ covid_result(Traveler) :-
 covid_result(Traveler) :-
     has_travelredlist(Traveler),
     yes(Traveler, 'exemption').
+
+% Travel Summary
+
+% Can travel as a returning citizen if owns  an IL passport OR owns an A1 VISA
+can_travel(Traveler) :-
+    purpose('r'),
+    yes(Traveler,'ilpassport'); yes(Traveler,'a1visa').
+
+% Can travel as for work if clergy with a3 VISA OR non clergy with b1 VISA
+can_travel(Traveler) :-
+    purpose('w'),
+    (
+        yes(Traveler,'clergy'),
+        yes(Traveler,'a3visa')
+    ) ;
+    (
+        no(Traveler,'clergy'),
+        yes(Traveler,'b1visa')
+    ).
 
 % ---- DICTIONARY ---- %
 
