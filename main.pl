@@ -71,9 +71,9 @@ return :-
     ).
 
 purpose :-
-    write('What is the purpose of your travel?'),
-    write('(w) work'),
-    write('(r) returning resident'),
+    write('What is the purpose of your travel?'), nl,
+    write('(w) work'),nl,
+    write('(r) returning resident'),nl,
     read(Response), 
     nl,
     (
