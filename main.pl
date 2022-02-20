@@ -98,6 +98,14 @@ return :-
         no('stay') -> assert(purpose(r))
     ).
 
+minors :- 
+    aggregate_all(count, minor(Traveler), X),
+    partysize(Y),
+    (
+      (X == Y) -> write('Unfortunately, minors are not allowed to travel.'), nl;
+      true
+    ).
+
 % ---- Questions ---- %
 
 profile :-
@@ -171,14 +179,6 @@ askMinor(Traveler) :-
     ( 
          (AgeResponse < 18) -> assert(minor(Traveler));
         (AgeResponse >= 18) -> true
-    ).
-
-minors :- 
-    aggregate_all(count, minor(Traveler), X),
-    partysize(Y),
-    (
-      (X == Y) -> write('Unfortunately, minors are not allowed to travel.'), nl;
-      true
     ).
 
 askvaccinated(Traveler) :-
