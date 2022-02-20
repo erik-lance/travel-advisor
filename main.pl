@@ -169,7 +169,7 @@ profile :-
             format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl
         );
 
-        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements. ~n', [Traveler]), nl
+        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements. ~n', [Name]), nl
     ),
     checkParty(Name).
 
@@ -270,7 +270,11 @@ covidFlow(Traveler) :-
             not(has_travelredlist(Traveler)) -> (
                 askvaccinated(Traveler),
                 (not(has_validvaccine(Traveler))) -> (
-                    ask(Traveler, 'Have you recieved a health maintenance organization issued Certificate of Recovery from the European Union?', 'certificate')
+                    ask(Traveler, 'Have you recieved a health maintenance organization issued Certificate of Recovery from the European Union?', 'certificate'),
+                    (no(Traveler, 'certificate')) -> (
+                        ask(Traveler, 'Do you have exceptional entry permission from the Population and Immigration Authority of Israel?', 'exemption')
+                    );
+                    true
                 );
                 (has_validvaccine(Traveler)) -> write('Your COVID documents appear in order.'),nl
             )
