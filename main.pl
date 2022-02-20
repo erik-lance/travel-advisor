@@ -234,15 +234,15 @@ askbooster(Traveler) :-
     assert(boosted(Traveler, booster(ResponseBrand, ResponseDays))).
 
 askfutureVaccine(Traveler) :-
-    write('What vaccine brand do you plan to take?'),
-    write('Note: if J&J, type jj.'),
+    write('What vaccine brand do you plan to take? '),
+    write('Note: if J&J, type jj.'), nl,
     read(ResponseBrand), nl,
     asknum('How many days from now do you plan to take it? ', ResponseDays), nl,
     assert(vaccinated(Traveler, vaccine(ResponseBrand,-ResponseDays))).
 
 askfutureBooster(Traveler) :-
-    write('What booster brand do you plan to take?'),
-    write('Note: if J&J, type jj.'),
+    write('What booster brand do you plan to take? '),
+    write('Note: if J&J, type jj.'), nl,
     read(ResponseBrand), nl,
     asknum('How many days from now do you plan to take it? ',
     ResponseDays), nl,
@@ -270,15 +270,15 @@ covidFlow(Traveler) :-
             not(has_travelredlist(Traveler)) -> (
                 askvaccinated(Traveler),
                 (not(has_validvaccine(Traveler))) -> (
-                    ask(Traveler, 'Have you recieved a health maintenance organization issued Certificate of Recovery from the european union', 'certificate')
+                    ask(Traveler, 'Have you recieved a health maintenance organization issued Certificate of Recovery from the European Union?', 'certificate')
                 );
-                (has_validvaccine(Traveler)) -> write('Your COVID documents appear in order')
+                (has_validvaccine(Traveler)) -> write('Your COVID documents appear in order.'),nl
             )
         )
     ).
 
 redListPrompt(Traveler) :-
-    asknum('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)', Number), nl,
+    asknum('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)', Number),
     ( (Number > 0) -> listCountry(Traveler, Number);
       (Number =< 0) -> true
     ).
@@ -288,7 +288,7 @@ listCountry(Traveler, Number) :-
     read(Country),
     assert(travel(Traveler, Country)),
     (   (Number - 1 > 0) -> listCountry(Traveler, Number - 1);
-        (Number - 1 =<0) -> write('All countries listed. ')
+        (Number - 1 =<0) -> write('All countries listed. '),nl
     ).
 
 printWorkVisa() :-
