@@ -12,7 +12,6 @@
         noTravel/1, yesTravel/1,
         minor/1, partyindex/1,
         flightDays/1, returnDays/1,
-
         asknum/2,
         yes/1, no/1,
         yes/2, no/2.
@@ -289,7 +288,7 @@ listCountry(Traveler, Number) :-
     read(Country),
     assert(travel(Traveler, Country)),
     (   (Number - 1 > 0) -> listCountry(Traveler, Number - 1);
-        (Number - 1 =<0) -> write('All countries listed.')
+        (Number - 1 =<0) -> write('All countries listed. ')
     ).
 
 printWorkVisa() :-
@@ -318,11 +317,11 @@ printClergyVisa() :-
     write('     Invitation from recognized religious Institute'), nl.
 
 printTemporaryResidentVisa() :-
-    write('To be applicable for a temporary Resident Visa one the following must be met'), nl,
+    write('To be applicable for an A/1 Temporary Resident visa, the following must be met'), nl,
     write('     A jew returning to Israel after being away or whose ancestors were away from Israel'), nl,
     write('     A person born from a Jewish Mother'), nl,
     write('     A convert to Judaism and not a member of any other religion'), nl,
-    write('For more requirements, please contact the Israel Ministry of Interior').
+    write('For more requirements, please contact the Israel Ministry of Interior'), nl.
 
 % --------------- Everything below is the knowledge base --------------- %
 
