@@ -28,7 +28,8 @@ welcome:-
         assert(partyindex(1)),
         flight,
         return,
-        profile,    
+        profile,
+        minors,    
         write('Thank you.')                           
       );
         write('Sorry, but your party must be at the size of 1-4 only.'),nl,
@@ -119,7 +120,7 @@ profile :-
                                         (
                                          ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
                                          
-                                         (    can_travel(Name))  -> write('You are all set!');
+                                         (    can_travel(Name))  -> write('You are all set! ');
                                          (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
                                             write('You need to provide a valid proof of your Israeli Citizenship.'), nl
                                                 
@@ -158,14 +159,12 @@ profile :-
 
         (purpose('v')) -> (
             printVisitorVisa,
-            format('I am sorry ~w, but you can not travel', [Name]),  nl
+            format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl
         );
 
-        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements.', [Traveler]), nl
+        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements. ~n', [Traveler]), nl
     ),
     checkParty(Name).
-
-% Returning
 
 askMinor(Traveler) :-
     asknum('What is your current age? ', AgeResponse),
@@ -178,6 +177,14 @@ askMinor(Traveler) :-
             )
         );
         (AgeResponse >= 18) -> true
+    ).
+
+minors :- 
+    aggregate_all(count, minor(Traveler), X),
+    partysize(Y),
+    (
+      (X == Y) -> write('Unfortunately, minors are not allowed to travel.'), nl;
+      true
     ).
 
 askvaccinated(Traveler) :-
@@ -213,7 +220,7 @@ askvaccinated(Traveler) :-
                     )
                 );
                 (no(Traveler,'futurevac')) -> (
-                    format('I am sorry ~w, but you can not travel', [Traveler])
+                    format('I am sorry ~w, but you can not travel. ~n', [Traveler])
                 )
             )
         )
@@ -259,7 +266,7 @@ checkParty(Traveler) :-
                                     nl,
                                     profile
                                  );
-        (PartyNum >= Capacity) -> write('All members have been checked.')
+        (PartyNum >= Capacity) -> write('All members have been checked. ')
     ).
 
 covidFlow(Traveler) :- 
@@ -278,8 +285,7 @@ covidFlow(Traveler) :-
     ).
 
 redListPrompt(Traveler) :-
-    write('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)'), nl,
-    read(Number),
+    asknum('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)', Number), nl,
     ( (Number > 0) -> listCountry(Traveler, Number);
       (Number =< 0) -> true
     ).
