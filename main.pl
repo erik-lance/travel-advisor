@@ -91,7 +91,7 @@ return :-
             nl,
             (
                 ( Days =< 90 ) -> assert(purpose(v));
-                ( Days  > 90 ) -> write('This means you are no longer elligible for a tourist VISA. It is only elligible for those staying below 90 days.'), nl, purpose(w)
+                ( Days  > 90 ) -> write('This means you are no longer elligible for a tourist VISA. It is only elligible for those staying below 90 days.'), nl, assert(purpose(w))
             )
         );
         no('stay') -> assert(purpose(r))
