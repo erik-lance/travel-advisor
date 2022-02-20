@@ -169,13 +169,7 @@ profile :-
 askMinor(Traveler) :-
     asknum('What is your current age? ', AgeResponse),
     ( 
-        (AgeResponse < 18) -> (write('Are you accompanied by a Parent?'),
-            read(PResponse),
-            (
-                (PResponse == 'no'; PResponse == 'n') -> assert(minor(Traveler));
-                true
-            )
-        );
+         (AgeResponse < 18) -> assert(minor(Traveler));
         (AgeResponse >= 18) -> true
     ).
 
