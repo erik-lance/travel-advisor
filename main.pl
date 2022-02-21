@@ -175,7 +175,7 @@ profile :-
             has_validCOVID_documents(Name) -> (
                 (no(Name,'citizen')) -> write('You are all set!'), nl;
                 (yes(Name,'citizen')) -> (
-                    ask('Do you have your Israeli passport?', 'ilpassport'),
+                    ask(Name, 'Do you have your Israeli passport?', 'ilpassport'),
                     (
                         (yes(Name,'ilpassport')) -> write('You are all set!'), nl;
                         ( no(Name,'ilpassport'))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
