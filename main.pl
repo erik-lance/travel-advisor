@@ -160,7 +160,7 @@ profile :-
             );
             (yes(Name,'citizen')) -> (
                 ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'), nl,
-                
+                (
                     (     can_travel(Name)) -> write('You are all set!'), nl;
                     ( not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
                                                write('You need to provide a valid proof of your Israeli Citizenship'), nl,
