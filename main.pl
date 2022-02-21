@@ -46,7 +46,7 @@ ask(Question, Desc) :-
         (Response ==  no; Response == n) -> assert(no(Desc));
         (
             write('Sorry. I do not recognize this input. '),
-            ask(Traveler, Question, Desc)
+            ask(Question, Desc)
         )
     ).
 
@@ -350,13 +350,13 @@ has_validvaccine(Traveler) :-
 % This is for cases where only pre-flight is relevant.
 has_valid_preflightvaccine(Traveler) :-
     vaccinated(Traveler,vaccine(VaccineBrand,Days)),
-    validbrand(VaccineBrad,days(Min,_)),
+    validbrand(VaccineBrand,days(Min,_)),
     flightDays(FDays),
     FDays + Days > Min-1.
 
 has_valid_preflightvaccine(Traveler) :-
     boosted(Traveler,booster(VaccineBrand,Days)),
-    validbrand(VaccineBrad,days(Min,_)),
+    validbrand(VaccineBrand,days(Min,_)),
     flightDays(FDays),
     FDays + Days > Min-1.
 
