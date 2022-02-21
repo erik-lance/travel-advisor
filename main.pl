@@ -28,7 +28,8 @@ welcome:-
         flight,
         return,
         profile,
-        minors,    
+        minors,
+        summary,    
         write('Thank you.')                           
       );
         write('Sorry, but your party must be at the size of 1-4 only.'),nl,
@@ -104,6 +105,28 @@ minors :-
       (X == Y) -> write('Unfortunately, a group of minors are not allowed to travel.'), nl;
       true
     ).
+
+summary :-
+    (not(can_travel(_))) -> true;
+    (
+        (purpose('r')) -> write('Your party is fit for return travel!');
+        (purpose('w')) -> write('Your party is fit for work travel!');
+        (purpose('v')) -> write('Your party is fit for tour travel!')
+    ),
+    nl,
+    write('Some reminders:'),nl,
+    write('   During Pre-flight, you must take a PCR test within the 72 hours'),nl,
+    write('   before your flight to Israel. This must be handled by professionals.'),nl,
+    write('   Not a home test. You are required to present an official document'),nl,
+    write('   attesting the negative result and specifying the your passport number.'),nl,
+    write('   Tests of any other kind will not be accepted.'),nl,nl,
+    write('   You are only exempted if:'),nl,
+    write('      outside Israel <72 hours'),nl,
+    write('      recovered recently within 3 months AND has a certificate'),nl,nl,
+    write('   Wear a mask on your nose and mouth (age >= 7)'),nl,nl,
+    write('   If you came from a redlisted country, you will need to isolate'),nl,
+    write('   upon arrival. You may opt for reduced isolation if you'),nl,
+    write('   have been vaccinated.'),nl,true.
 
 % ---- Questions ---- %
 
