@@ -171,13 +171,24 @@ profile :-
 
         % Travel for Visiting or Touring
         % (Visiting, and is either a citizen or passed their covid results)
-        (purpose('v')) -> (
-            (has_validCOVID_documents(Name)) -> write('You are all set!'),nl;
-            (
-                format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
-                printVisitorVisa,
-                true
+        (purpose('v'), has_validCOVID_documents(Name)) -> (
+            (no(Name,'citizen')) -> (
+                (
+                    (can_travel(Name)) -> write('You are all set!'), nl;
+                    (not(can_travel(Name)))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                                                printVisitorVisa
+                )
+            );
+            (yes(Name,'citizen')) -> (
+                ask('Do you have your Israeli passport?', 'ilpassport'),
+                (
+                    (can_travel(Name)) -> write('You are all set!'), nl;
+                    (not(can_travel(Name)))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                                                write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                                write('to comply with the law of return.'), nl
+                )
             )
+            
         );
 
         % For those who failed the COVID tests or documents.
