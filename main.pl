@@ -177,8 +177,8 @@ profile :-
                 (yes(Name,'citizen')) -> (
                     ask('Do you have your Israeli passport?', 'ilpassport'),
                     (
-                        (can_travel(Name)) -> write('You are all set!'), nl;
-                        (not(can_travel(Name)))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                        (yes(Name,'ilpassport')) -> write('You are all set!'), nl;
+                        ( no(Name,'ilpassport'))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
                                                     write('You need to provide a valid proof of your Israeli Citizenship'), nl,
                                                     write('to comply with the law of return.'), nl
                     )
