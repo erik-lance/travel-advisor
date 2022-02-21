@@ -127,7 +127,8 @@ profile :-
                 ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
                 (    can_travel(Name))  -> write('You are all set! '), nl;
                 (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
-                                           write('You need to provide a valid proof of your Israeli Citizenship.'), nl
+                                           write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                           write('to comply with the law of return.'), nl
             );
             ( no(Name,'citizen')) -> (
                 ask(Name, 'Do you have an A/1 VISA?','a1visa'),
@@ -157,7 +158,16 @@ profile :-
                     )    
                 )
             );
-            (yes(Name,'citizen')) -> write('You are all set!'), nl
+            (yes(Name,'citizen')) -> (
+                
+                ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'), nl,
+                (
+                    (yes(can_travel(Name))) -> write('You are all set!'), nl;
+                    ( no(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                                               write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                               write('to comply with the law of return.'), nl
+                )
+            )
         );
 
         % Travel for Visiting or Touring
@@ -431,6 +441,12 @@ has_validCOVID_documents(Traveler) :-
 can_travel(Traveler) :-
     purpose('r'),
     yes(Traveler,'ilpassport'); yes(Traveler,'a1visa').
+
+% Can travel as a working citizen if owns an IL passport
+can_travel(Traveler) :-
+    purpose('w'),
+    yes(Traveler,'citizen'),
+    yes(Traveler,'ilpassport').
 
 % Can travel as for work if clergy with a3 VISA OR non clergy with b1 VISA
 can_travel(Traveler) :-
