@@ -98,10 +98,10 @@ return :-
     ).
 
 minors :- 
-    aggregate_all(count, minor(Traveler), X),
+    aggregate_all(count, minor(_), X),
     partysize(Y),
     (
-      (X == Y) -> write('Unfortunately, minors are not allowed to travel.'), nl;
+      (X == Y) -> write('Unfortunately, a group of minors are not allowed to travel.'), nl;
       true
     ).
 
@@ -122,7 +122,7 @@ profile :-
     ),
     (
         % Returning Citizens
-        (purpose('r'), has_validCOVID_documents(Traveler)) -> (
+        (purpose('r'), has_validCOVID_documents(Name)) -> (
             (yes(Name,'citizen')) -> (
                 ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
                 (    can_travel(Name))  -> write('You are all set! '), nl;
@@ -141,7 +141,7 @@ profile :-
 
         % Travel for Work / Official Business
         % (Working, and is either a citizen or passed their covid results)
-        (purpose('w'), has_validCOVID_documents(Traveler)) -> 
+        (purpose('w'), has_validCOVID_documents(Name)) -> 
         (
             (no(Name,'citizen')) -> (
                 ask(Name, 'Are you working as a Clergy?','clergy'),
@@ -172,7 +172,7 @@ profile :-
         % Travel for Visiting or Touring
         % (Visiting, and is either a citizen or passed their covid results)
         (purpose('v')) -> (
-            (has_validCOVID_documents(Traveler)) -> write('You are all set!'),nl;
+            (has_validCOVID_documents(Name)) -> write('You are all set!'),nl;
             (
                 format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
                 printVisitorVisa,
