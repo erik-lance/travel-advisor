@@ -122,14 +122,13 @@ profile :-
     ),
     (
         % Returning Citizens
-        (purpose('r'), (covid_result(Name) ; has_valid_preflightvaccine(Name)) ; yes(Name,'citizen')) -> (
-            (yes(Name,'citizen')) -> 
-                                    (
-                                        ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
-                                        (    can_travel(Name))  -> write('You are all set! '), nl;
-                                        (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
-                                        write('You need to provide a valid proof of your Israeli Citizenship.'), nl
-                                    );
+        (purpose('r'), has_validCOVID_documents(Traveler)) -> (
+            (yes(Name,'citizen')) -> (
+                ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
+                (    can_travel(Name))  -> write('You are all set! '), nl;
+                (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                                           write('You need to provide a valid proof of your Israeli Citizenship.'), nl
+            );
             ( no(Name,'citizen')) -> (
                 ask(Name, 'Do you have an A/1 VISA?','a1visa'),
                 (
@@ -141,7 +140,7 @@ profile :-
 
         % Travel for Work / Official Business
         % (Working, and is either a citizen or passed their covid results)
-        (purpose('w'),  covid_result(Name) ; yes(Name,'citizen')) -> 
+        (purpose('w'), has_validCOVID_documents(Traveler)) -> 
         (
             (no(Name,'citizen')) -> (
                 ask(Name, 'Are you working as a Clergy?','clergy'),
@@ -164,7 +163,7 @@ profile :-
         % Travel for Visiting or Touring
         % (Visiting, and is either a citizen or passed their covid results)
         (purpose('v')) -> (
-            (yes(Name,'citizen') ; covid_result(Name)) -> write('You are all set!'),nl;
+            (has_validCOVID_documents(Traveler)) -> write('You are all set!'),nl;
             (
                 format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
                 printVisitorVisa,
@@ -408,6 +407,25 @@ covid_result(Traveler) :-
     yes(Traveler, 'exemption').
 
 % Travel Summary
+has_validCOVID_documents(Traveler) :-
+    purpose('r'),
+    no(Traveler,'citizen'),
+    covid_result(Traveler),
+    has_valid_preflightvaccine(Traveler).
+
+has_validCOVID_documents(Traveler) :-
+    purpose('r'),
+    yes(Traveler,'citizen').
+
+has_validCOVID_documents(Traveler) :-
+    (purpose('w') ; purpose('v')),
+    no(Traveler,'citizen'),
+    covid_result(Traveler).
+
+has_validCOVID_documents(Traveler) :-
+    (purpose('w') ; purpose('v')),
+    yes(Traveler,'citizen').
+
 
 % Can travel as a returning citizen if owns an IL passport OR owns an A1 VISA
 can_travel(Traveler) :-
