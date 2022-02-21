@@ -92,7 +92,7 @@ return :-
             nl,
             (
                 ( Days =< 90 ) -> assert(purpose(v));
-                ( Days  > 90 ) -> write('This means you are no longer elligible for a tourist VISA. It is only elligible for those staying below 90 days.'), nl, assert(purpose(w))
+                ( Days  > 90 ) -> write('This means you are no longer eligible for a tourist VISA. It is only eligible for those staying below 90 days.'), nl, assert(purpose(w))
             )
         );
         no('stay') -> assert(purpose(r))
@@ -315,7 +315,7 @@ covidFlow(Traveler) :-
             not(has_travelredlist(Traveler)) -> (
                 askvaccinated(Traveler),
                 (not(has_validvaccine(Traveler))) -> (
-                    ask(Traveler, 'Have you recieved a health maintenance organization issued Certificate of Recovery from the European Union?', 'certificate'),
+                    ask(Traveler, 'Have you received a health maintenance organization issued Certificate of Recovery from the European Union?', 'certificate'),
                     (no(Traveler, 'certificate')) -> (
                         ask(Traveler, 'Do you have exceptional entry permission from the Population and Immigration Authority of Israel?', 'exemption')
                     );
