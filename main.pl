@@ -171,24 +171,21 @@ profile :-
 
         % Travel for Visiting or Touring
         % (Visiting, and is either a citizen or passed their covid results)
-        (purpose('v'), has_validCOVID_documents(Name)) -> (
-            (no(Name,'citizen')) -> (
-                (
-                    (can_travel(Name)) -> write('You are all set!'), nl;
-                    (not(can_travel(Name)))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
-                                                printVisitorVisa
+        (purpose('v')) -> (
+            has_validCOVID_documents(Name) -> (
+                (no(Name,'citizen')) -> write('You are all set!'), nl;
+                (yes(Name,'citizen')) -> (
+                    ask('Do you have your Israeli passport?', 'ilpassport'),
+                    (
+                        (can_travel(Name)) -> write('You are all set!'), nl;
+                        (not(can_travel(Name)))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                                                    write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                                    write('to comply with the law of return.'), nl
+                    )
                 )
             );
-            (yes(Name,'citizen')) -> (
-                ask('Do you have your Israeli passport?', 'ilpassport'),
-                (
-                    (can_travel(Name)) -> write('You are all set!'), nl;
-                    (not(can_travel(Name)))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
-                                                write('You need to provide a valid proof of your Israeli Citizenship'), nl,
-                                                write('to comply with the law of return.'), nl
-                )
-            )
-            
+            not(has_validCOVID_documents(Name)) -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                                                   printVisitorVisa
         );
 
         % For those who failed the COVID tests or documents.
