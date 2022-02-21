@@ -123,9 +123,9 @@ summary :-
     write('   attesting the negative result and specifying the your passport number.'),nl,
     write('   Tests of any other kind will not be accepted.'),nl,nl,
     write('   You are only exempted if:'),nl,
-    write('      outside Israel <72 hours'),nl,
+    write('      outside Israel less than 72 hours'),nl,
     write('      recovered recently within 3 months AND has a certificate'),nl,nl,
-    write('   Wear a mask on your nose and mouth (age >= 7)'),nl,nl,
+    write('   Wear a mask on your nose and mouth (age from 7 up)'),nl,nl,
     write('   If you came from a redlisted country, you will need to isolate'),nl,
     write('   upon arrival. You may opt for reduced isolation if you'),nl,
     write('   have been vaccinated.'),nl,true.
