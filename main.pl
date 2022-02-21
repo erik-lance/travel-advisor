@@ -467,6 +467,18 @@ can_travel(Traveler) :-
         yes(Traveler,'b1visa')
     ).
 
+% Can travel for visit if not a citizen and has valid COVID documents
+can_travel(Traveler) :-
+    purpose('v'),
+    no(Traveler,'citizen'),
+    has_validCOVID_documents(Traveler).
+
+% Can travel for visit if citizen and has passport
+can_travel(Traveler) :-
+    purpose('v'),
+    yes(Traveler,'citizen'),
+    yes(Traveler,'ilpassport').
+
 % ---- DICTIONARY ---- %
 
 list_of_travels(X,TravelList) :- findall(Country, travel(X,Country), TravelList).
