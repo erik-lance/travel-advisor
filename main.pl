@@ -107,7 +107,9 @@ minors :-
     ).
 
 summary :-
-    (not(can_travel(_))) -> true;
+    aggregate_all(count, can_travel(_), X),
+    partysize(Y),
+    (X < Y) -> true;
     (
         (purpose('r')) -> write('Your party is fit for return travel!');
         (purpose('w')) -> write('Your party is fit for work travel!');
