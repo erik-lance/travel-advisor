@@ -121,55 +121,59 @@ profile :-
         (yes(Name,'citizen')) -> true
     ),
     (
+        % Returning Citizens
         (purpose('r'), (covid_result(Name) ; has_valid_preflightvaccine(Name)) ; yes(Name,'citizen')) -> (
-            (
-                (yes(Name,'citizen')) -> 
-                                        (
-                                         ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
-                                         
-                                         (    can_travel(Name))  -> write('You are all set! ');
-                                         (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
-                                            write('You need to provide a valid proof of your Israeli Citizenship.'), nl
-                                                
-                                            
-                                        );
-                ( no(Name,'citizen')) -> (
-                    ask(Name, 'Do you have an A/1 VISA?',           'a1visa'),
-                    (
-                        can_travel(Name) -> write('You are all set!');
-                        not(can_travel(Name)) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl, printTemporaryResidentVisa()
-                    )
+            (yes(Name,'citizen')) -> 
+                                    (
+                                        ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
+                                        (    can_travel(Name))  -> write('You are all set! '), nl;
+                                        (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                                        write('You need to provide a valid proof of your Israeli Citizenship.'), nl
+                                    );
+            ( no(Name,'citizen')) -> (
+                ask(Name, 'Do you have an A/1 VISA?','a1visa'),
+                (
+                    can_travel(Name) -> write('You are all set!'), nl;
+                    not(can_travel(Name)) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl, printTemporaryResidentVisa()
                 )
             )
         );
 
+        % Travel for Work / Official Business
+        % (Working, and is either a citizen or passed their covid results)
         (purpose('w'),  covid_result(Name) ; yes(Name,'citizen')) -> 
         (
-            ask(Name, 'Are you working as a Clergy?','clergy'),
-            (
-                (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa');
-                ( no(Name,'clergy')) -> ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
-            ),
-            (
-                can_travel(Name) -> write('You are all set!');
-                (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+            (no(Name,'citizen')) -> (
+                ask(Name, 'Are you working as a Clergy?','clergy'),
                 (
-                    (yes(Name,'clergy'), no(Name,'a3visa')) -> printClergyVisa;
-                    ( no(Name,'clergy'), no(Name,'b1visa')) -> printWorkVisa
-                )    
+                    (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa');
+                    ( no(Name,'clergy')) -> ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
+                ),
+                (
+                    can_travel(Name) -> write('You are all set!'), nl;
+                    (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                    (
+                        (yes(Name,'clergy'), no(Name,'a3visa')) -> printClergyVisa;
+                        ( no(Name,'clergy'), no(Name,'b1visa')) -> printWorkVisa
+                    )    
+                )
+            );
+            (yes(Name,'citizen')) -> write('You are all set!'), nl
+        );
+
+        % Travel for Visiting or Touring
+        % (Visiting, and is either a citizen or passed their covid results)
+        (purpose('v')) -> (
+            (yes(Name,'citizen') ; covid_result(Name)) -> write('You are all set!'),nl;
+            (
+                format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                printVisitorVisa,
+                true
             )
         );
 
-        (purpose('v'),  yes(Name,'citizen') ; covid_result(Name)) -> (
-            write('You are all set!'),nl
-        );
-
-        (purpose('v')) -> (
-            printVisitorVisa,
-            format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl
-        );
-
-        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements. ~n', [Name]), nl
+        % For those who failed the COVID tests or documents.
+        (not(covid_result(Name)); not(can_travel(Name))) -> format('I am sorry ~w, but you do not have the valid requirements. ~n', [Name]), nl
     ),
     checkParty(Name).
 
@@ -181,7 +185,7 @@ askMinor(Traveler) :-
     ).
 
 askvaccinated(Traveler) :-
-    ask(Traveler, 'Are you vaccinated at 2nd dose?', 'vaccinated'),
+    ask(Traveler, 'Are you vaccinated at 2nd dose? (or 1 for J&J)', 'vaccinated'),
     nl,
     (
         (yes(Traveler,'vaccinated')) -> (
@@ -199,9 +203,9 @@ askvaccinated(Traveler) :-
                 )
             )
         );
-
+        % This will then ask if they plan to get vaccines in the future.
         (no(Traveler,'vaccinated')) -> (
-            ask(Traveler,'Do you plan to get your second dose in the future days?', 'futurevac'),
+            ask(Traveler,'Do you plan to get your second dose (or 1st for J&J) in the future days?', 'futurevac'),
             (
                 (yes(Traveler,'futurevac')) -> (
                     askfutureVaccine(Traveler),
@@ -278,7 +282,10 @@ covidFlow(Traveler) :-
                 );
                 (has_validvaccine(Traveler)) -> write('Your COVID documents appear in order.'),nl
             )
-        )
+        ),
+        % This prints if traveler failed the COVID reqs.
+        (no(Traveler,'exemption')) -> printCOVIDReqs;
+        true
     ).
 
 redListPrompt(Traveler) :-
@@ -326,6 +333,18 @@ printTemporaryResidentVisa() :-
     write('     A person born from a Jewish Mother'), nl,
     write('     A convert to Judaism and not a member of any other religion'), nl,
     write('For more requirements, please contact the Israel Ministry of Interior'), nl.
+
+printCOVIDReqs() :-
+    write('COVID Test Requirements'), nl,
+    write('     Travelers must be vaccinated with a WHO (World Health Organization) approved vaccine'), nl,
+    write('     or recovery confirmed by a country from the European Union with a certificate.'), nl,
+    write('     Vaccines valid: (Pfizer/Moderna/AstraZeneca/Sinovac/Sinopharm/J&J)'), nl,
+    write('         - Vaccinated with two doses (or 1 for J&J)'), nl,
+    write('         - However, for Pfizer vaccines, 7 days is the minimum.'), nl,
+    write('         - 14 days or more have passed since date of second dose on flight.'), nl,
+    write('         - but not more than 180 days on the day of leaving Israel.'), nl,
+    write('     You must also have not traveled to a red listed country the past 14 days before boarding.'), nl,
+    write('     However, if you can present an exemption certificate, you will not need any of the above.'), nl.
 
 % --------------- Everything below is the knowledge base --------------- %
 
@@ -390,7 +409,7 @@ covid_result(Traveler) :-
 
 % Travel Summary
 
-% Can travel as a returning citizen if owns  an IL passport OR owns an A1 VISA
+% Can travel as a returning citizen if owns an IL passport OR owns an A1 VISA
 can_travel(Traveler) :-
     purpose('r'),
     yes(Traveler,'ilpassport'); yes(Traveler,'a1visa').
