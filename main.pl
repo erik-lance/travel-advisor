@@ -12,7 +12,6 @@
         noTravel/1, yesTravel/1,
         minor/1, partyindex/1,
         flightDays/1, returnDays/1,
-
         asknum/2,
         yes/1, no/1,
         yes/2, no/2.
@@ -20,22 +19,30 @@
 welcome:- 
     write('Trip Advisor Agent (TAA) Israel'),
     nl,
-    % ask('Would you like to travel to Israel?').
-    asknum('What is the size of your party? ', PartySize), nl,
-    (
-      (PartySize > 0, PartySize < 5) -> (
-        assert(partysize(PartySize)),
-        assert(partyindex(1)),
-        flight,
-        return,
-        profile,    
-        write('Thank you.')                           
-      );
-        write('Sorry, but your party must be at the size of 1-4 only.'),nl,
-        welcome
+    ask('Would you like to travel to Israel?','start'),
+    (yes(start)) -> (
+        asknum('What is the size of your party? ', PartySize), nl,
+        (
+        (PartySize > 0, PartySize < 5) -> (
+            assert(partysize(PartySize)),
+            assert(partyindex(1)),
+            flight,
+            return,
+            profile,
+            minors,
+            summary,    
+            write('Thank you.')                           
+        );
+            write('Sorry, but your party must be at the size of 1-4 only.'),nl,
+            welcome
+        )   
+    );
+    (no(start)) ->  (
+      write('Okay, thank you.')
     ).
     
-% Thes will be used for yes/no questions only.
+    
+% These will be used for yes/no questions only.
 ask(Question, Desc) :-
     write(Question), nl,
     write(' (yes/no) or (y/n)'),
@@ -46,7 +53,7 @@ ask(Question, Desc) :-
         (Response ==  no; Response == n) -> assert(no(Desc));
         (
             write('Sorry. I do not recognize this input. '),
-            ask(Traveler, Question, Desc)
+            ask(Question, Desc)
         )
     ).
 
@@ -91,11 +98,40 @@ return :-
             nl,
             (
                 ( Days =< 90 ) -> assert(purpose(v));
-                ( Days  > 90 ) -> write('This means you are no longer elligible for a tourist VISA. It is only elligible for those staying below 90 days.'), nl, purpose(w)
+                ( Days  > 90 ) -> write('This means you are no longer eligible for a tourist VISA. It is only eligible for those staying below 90 days.'), nl, assert(purpose(w))
             )
         );
         no('stay') -> assert(purpose(r))
     ).
+
+minors :- 
+      (allMinors) -> write('Unfortunately, a group of minors are not allowed to travel.'), nl;
+      true.
+
+summary :-
+    aggregate_all(count, can_travel(_), X),
+    partysize(Y),
+    (X < Y) -> true;
+    (allMinors) -> true;
+    (
+        (purpose('r')) -> write('Your party is fit for return travel!');
+        (purpose('w')) -> write('Your party is fit for work travel!');
+        (purpose('v')) -> write('Your party is fit for tour travel!')
+    ),
+    nl,
+    write('Some reminders:'),nl,
+    write('   During Pre-flight, you must take a PCR test within the 72 hours'),nl,
+    write('   before your flight to Israel. This must be handled by professionals.'),nl,
+    write('   Not a home test. You are required to present an official document'),nl,
+    write('   attesting the negative result and specifying the your passport number.'),nl,
+    write('   Tests of any other kind will not be accepted.'),nl,nl,
+    write('   You are only exempted if:'),nl,
+    write('      outside Israel less than 72 hours'),nl,
+    write('      recovered recently within 3 months AND has a certificate'),nl,nl,
+    write('   Wear a mask on your nose and mouth (age from 7 up)'),nl,nl,
+    write('   If you came from a redlisted country, you will need to isolate'),nl,
+    write('   upon arrival. You may opt for reduced isolation if you'),nl,
+    write('   have been vaccinated.'),nl,true.
 
 % ---- Questions ---- %
 
@@ -113,75 +149,87 @@ profile :-
         (yes(Name,'citizen')) -> true
     ),
     (
-        (purpose('r'), (covid_result(Name) ; has_valid_preflightvaccine(Name)) ; yes(Name,'citizen')) -> (
-            (
-                (yes(Name,'citizen')) -> 
-                                        (
-                                         ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
-                                         
-                                         (    can_travel(Name))  -> write('You are all set!');
-                                         (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
-                                            write('You need to provide a valid proof of your Israeli Citizenship.'), nl
-                                                
-                                            
-                                        );
-                ( no(Name,'citizen')) -> (
-                    ask(Name, 'Do you have an A/1 VISA?',           'a1visa'),
-                    (
-                        can_travel(Name) -> write('You are all set!');
-                        not(can_travel(Name)) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl, printTemporaryResidentVisa()
-                    )
+        % Returning Citizens
+        (purpose('r'), has_validCOVID_documents(Name)) -> (
+            (yes(Name,'citizen')) -> (
+                ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'),
+                (    can_travel(Name))  -> write('You are all set! '), nl;
+                (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                                           write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                           write('to comply with the law of return.'), nl
+            );
+            ( no(Name,'citizen')) -> (
+                ask(Name, 'Do you have an A/1 VISA?','a1visa'),
+                (
+                    can_travel(Name) -> write('You are all set!'), nl;
+                    not(can_travel(Name)) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl, printTemporaryResidentVisa()
                 )
             )
         );
 
-        (purpose('w'),  covid_result(Name) ; yes(Name,'citizen')) -> 
+        % Travel for Work / Official Business
+        % (Working, and is either a citizen or passed their covid results)
+        (purpose('w'), has_validCOVID_documents(Name)) -> 
         (
-            ask(Name, 'Are you working as a Clergy?','clergy'),
-            (
-                (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa');
-                ( no(Name,'clergy')) -> ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
-            ),
-            (
-                can_travel(Name) -> write('You are all set!');
-                (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+            (no(Name,'citizen')) -> (
+                ask(Name, 'Are you working as a Clergy?','clergy'),
                 (
-                    (yes(Name,'clergy'), no(Name,'a3visa')) -> printClergyVisa;
-                    ( no(Name,'clergy'), no(Name,'b1visa')) -> printWorkVisa
-                )    
+                    (yes(Name,'clergy')) -> ask(Name, 'Do you have an A/3 VISA?', 'a3visa');
+                    ( no(Name,'clergy')) -> ask(Name, 'Do you have a B/1 VISA?',  'b1visa')
+                ),
+                (
+                    can_travel(Name) -> write('You are all set!'), nl;
+                    (not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                    (
+                        (yes(Name,'clergy'), no(Name,'a3visa')) -> printClergyVisa;
+                        ( no(Name,'clergy'), no(Name,'b1visa')) -> printWorkVisa
+                    )    
+                )
+            );
+            (yes(Name,'citizen')) -> (
+                ask(Name, 'Do you have your Israeli Passport?', 'ilpassport'), nl,
+                (
+                    (     can_travel(Name)) -> write('You are all set!'), nl;
+                    ( not(can_travel(Name))) -> format('I am sorry, ~w, but you are missing requirements.', [Name]), nl,
+                                               write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                               write('to comply with the law of return.'), nl
+                )
             )
         );
 
-        (purpose('v'),  yes(Name,'citizen') ; covid_result(Name)) -> (
-            write('You are all set!'),nl
-        );
-
+        % Travel for Visiting or Touring
+        % (Visiting, and is either a citizen or passed their covid results)
         (purpose('v')) -> (
-            printVisitorVisa,
-            format('I am sorry ~w, but you can not travel', [Name]),  nl
+            has_validCOVID_documents(Name) -> (
+                (no(Name,'citizen')) -> write('You are all set!'), nl;
+                (yes(Name,'citizen')) -> (
+                    ask(Name, 'Do you have your Israeli passport?', 'ilpassport'),
+                    (
+                        (yes(Name,'ilpassport')) -> write('You are all set!'), nl;
+                        ( no(Name,'ilpassport'))  -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                                                    write('You need to provide a valid proof of your Israeli Citizenship'), nl,
+                                                    write('to comply with the law of return.'), nl
+                    )
+                )
+            );
+            not(has_validCOVID_documents(Name)) -> format('I am sorry ~w, but you can not travel. ~n', [Name]),  nl,
+                                                   printVisitorVisa
         );
 
-        (not(covid_result(Name))) -> format('I am sorry ~w, but you do not have the valid COVID requirements.', [Traveler]), nl
+        % For those who failed the COVID tests or documents.
+        (not(covid_result(Name)); not(can_travel(Name))) -> format('I am sorry ~w, but you do not have the valid requirements. ~n', [Name]), nl
     ),
     checkParty(Name).
-
-% Returning
 
 askMinor(Traveler) :-
     asknum('What is your current age? ', AgeResponse),
     ( 
-        (AgeResponse < 18) -> (write('Are you accompanied by a Parent?'),
-            read(PResponse),
-            (
-                (PResponse == 'no'; PResponse == 'n') -> assert(minor(Traveler));
-                true
-            )
-        );
+         (AgeResponse < 18) -> assert(minor(Traveler));
         (AgeResponse >= 18) -> true
     ).
 
 askvaccinated(Traveler) :-
-    ask(Traveler, 'Are you vaccinated at 2nd dose?', 'vaccinated'),
+    ask(Traveler, 'Are you vaccinated at 2nd dose? (or 1 for J&J)', 'vaccinated'),
     nl,
     (
         (yes(Traveler,'vaccinated')) -> (
@@ -199,9 +247,9 @@ askvaccinated(Traveler) :-
                 )
             )
         );
-
+        % This will then ask if they plan to get vaccines in the future.
         (no(Traveler,'vaccinated')) -> (
-            ask(Traveler,'Do you plan to get your second dose in the future days?', 'futurevac'),
+            ask(Traveler,'Do you plan to get your second dose (or 1st for J&J) in the future days?', 'futurevac'),
             (
                 (yes(Traveler,'futurevac')) -> (
                     askfutureVaccine(Traveler),
@@ -213,7 +261,7 @@ askvaccinated(Traveler) :-
                     )
                 );
                 (no(Traveler,'futurevac')) -> (
-                    format('I am sorry ~w, but you can not travel', [Traveler])
+                    format('I am sorry ~w, but you can not travel. ~n', [Traveler])
                 )
             )
         )
@@ -234,15 +282,15 @@ askbooster(Traveler) :-
     assert(boosted(Traveler, booster(ResponseBrand, ResponseDays))).
 
 askfutureVaccine(Traveler) :-
-    write('What vaccine brand do you plan to take?'),
-    write('Note: if J&J, type jj.'),
+    write('What vaccine brand do you plan to take? '),
+    write('Note: if J&J, type jj.'), nl,
     read(ResponseBrand), nl,
     asknum('How many days from now do you plan to take it? ', ResponseDays), nl,
     assert(vaccinated(Traveler, vaccine(ResponseBrand,-ResponseDays))).
 
 askfutureBooster(Traveler) :-
-    write('What booster brand do you plan to take?'),
-    write('Note: if J&J, type jj.'),
+    write('What booster brand do you plan to take? '),
+    write('Note: if J&J, type jj.'), nl,
     read(ResponseBrand), nl,
     asknum('How many days from now do you plan to take it? ',
     ResponseDays), nl,
@@ -259,7 +307,7 @@ checkParty(Traveler) :-
                                     nl,
                                     profile
                                  );
-        (PartyNum >= Capacity) -> write('All members have been checked.')
+        (PartyNum >= Capacity) -> write('All members have been checked. ')
     ).
 
 covidFlow(Traveler) :- 
@@ -270,16 +318,22 @@ covidFlow(Traveler) :-
             not(has_travelredlist(Traveler)) -> (
                 askvaccinated(Traveler),
                 (not(has_validvaccine(Traveler))) -> (
-                    ask(Traveler, 'Have you recieved a health maintenance organization issued Certificate of Recovery from the european union', 'certificate')
+                    ask(Traveler, 'Have you received a health maintenance organization issued Certificate of Recovery from the European Union?', 'certificate'),
+                    (no(Traveler, 'certificate')) -> (
+                        ask(Traveler, 'Do you have exceptional entry permission from the Population and Immigration Authority of Israel?', 'exemption')
+                    );
+                    true
                 );
-                (has_validvaccine(Traveler)) -> write('Your COVID documents appear in order')
+                (has_validvaccine(Traveler)) -> write('Your COVID documents appear in order.'),nl
             )
-        )
+        ),
+        % This prints if traveler failed the COVID reqs.
+        (no(Traveler,'exemption')) -> printCOVIDReqs;
+        true
     ).
 
 redListPrompt(Traveler) :-
-    write('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)'), nl,
-    read(Number),
+    asknum('How many countries have you visited or plan to visit within 14 days before your flight to Israel? (0 if none)', Number),
     ( (Number > 0) -> listCountry(Traveler, Number);
       (Number =< 0) -> true
     ).
@@ -289,7 +343,7 @@ listCountry(Traveler, Number) :-
     read(Country),
     assert(travel(Traveler, Country)),
     (   (Number - 1 > 0) -> listCountry(Traveler, Number - 1);
-        (Number - 1 =<0) -> write('All countries listed.')
+        (Number - 1 =<0) -> write('All countries listed. '),nl
     ).
 
 printWorkVisa() :-
@@ -318,15 +372,38 @@ printClergyVisa() :-
     write('     Invitation from recognized religious Institute'), nl.
 
 printTemporaryResidentVisa() :-
-    write('To be applicable for a temporary Resident Visa one the following must be met'), nl,
+    write('To be applicable for an A/1 Temporary Resident visa, the following must be met'), nl,
     write('     A jew returning to Israel after being away or whose ancestors were away from Israel'), nl,
     write('     A person born from a Jewish Mother'), nl,
     write('     A convert to Judaism and not a member of any other religion'), nl,
-    write('For more requirements, please contact the Israel Ministry of Interior').
+    write('For more requirements, please contact the Israel Ministry of Interior'), nl.
+
+printCOVIDReqs() :-
+    write('COVID Test Requirements'), nl,
+    write('     Travelers must be vaccinated with a WHO (World Health Organization) approved vaccine'), nl,
+    write('     or recovery confirmed by a country from the European Union with a certificate.'), nl,
+    write('     Vaccines valid: (Pfizer/Moderna/AstraZeneca/Sinovac/Sinopharm/J&J)'), nl,
+    write('         - Vaccinated with two doses (or 1 for J&J)'), nl,
+    write('         - However, for Pfizer vaccines, 7 days is the minimum.'), nl,
+    write('         - 14 days or more have passed since date of second dose on flight.'), nl,
+    write('         - but not more than 180 days on the day of leaving Israel.'), nl,
+    write('     You must also have not traveled to a red listed country the past 14 days before boarding.'), nl,
+    write('     However, if you can present an exemption certificate, you will not need any of the above.'), nl.
 
 % --------------- Everything below is the knowledge base --------------- %
 
 % ---- RULES ---- %
+
+% PROFILE
+allMinors :-
+    aggregate_all(count, minor(_), X),
+    partysize(Y),
+    (
+      (X == Y) -> true;
+      fail
+    ).
+
+% COVID REQS
 
 % X has a validvaccine IF
 % X is vaccinated with a valid brand
@@ -347,13 +424,13 @@ has_validvaccine(Traveler) :-
 % This is for cases where only pre-flight is relevant.
 has_valid_preflightvaccine(Traveler) :-
     vaccinated(Traveler,vaccine(VaccineBrand,Days)),
-    validbrand(VaccineBrad,days(Min,_)),
+    validbrand(VaccineBrand,days(Min,_)),
     flightDays(FDays),
     FDays + Days > Min-1.
 
 has_valid_preflightvaccine(Traveler) :-
     boosted(Traveler,booster(VaccineBrand,Days)),
-    validbrand(VaccineBrad,days(Min,_)),
+    validbrand(VaccineBrand,days(Min,_)),
     flightDays(FDays),
     FDays + Days > Min-1.
 
@@ -386,11 +463,36 @@ covid_result(Traveler) :-
     yes(Traveler, 'exemption').
 
 % Travel Summary
+has_validCOVID_documents(Traveler) :-
+    purpose('r'),
+    no(Traveler,'citizen'),
+    covid_result(Traveler),
+    has_valid_preflightvaccine(Traveler).
 
-% Can travel as a returning citizen if owns  an IL passport OR owns an A1 VISA
+has_validCOVID_documents(Traveler) :-
+    purpose('r'),
+    yes(Traveler,'citizen').
+
+has_validCOVID_documents(Traveler) :-
+    (purpose('w') ; purpose('v')),
+    no(Traveler,'citizen'),
+    covid_result(Traveler).
+
+has_validCOVID_documents(Traveler) :-
+    (purpose('w') ; purpose('v')),
+    yes(Traveler,'citizen').
+
+
+% Can travel as a returning citizen if owns an IL passport OR owns an A1 VISA
 can_travel(Traveler) :-
     purpose('r'),
     yes(Traveler,'ilpassport'); yes(Traveler,'a1visa').
+
+% Can travel as a working citizen if owns an IL passport
+can_travel(Traveler) :-
+    purpose('w'),
+    yes(Traveler,'citizen'),
+    yes(Traveler,'ilpassport').
 
 % Can travel as for work if clergy with a3 VISA OR non clergy with b1 VISA
 can_travel(Traveler) :-
@@ -403,6 +505,18 @@ can_travel(Traveler) :-
         no(Traveler,'clergy'),
         yes(Traveler,'b1visa')
     ).
+
+% Can travel for visit if not a citizen and has valid COVID documents
+can_travel(Traveler) :-
+    purpose('v'),
+    no(Traveler,'citizen'),
+    has_validCOVID_documents(Traveler).
+
+% Can travel for visit if citizen and has passport
+can_travel(Traveler) :-
+    purpose('v'),
+    yes(Traveler,'citizen'),
+    yes(Traveler,'ilpassport').
 
 % ---- DICTIONARY ---- %
 
