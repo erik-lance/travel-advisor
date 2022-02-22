@@ -99,17 +99,14 @@ return :-
     ).
 
 minors :- 
-    aggregate_all(count, minor(_), X),
-    partysize(Y),
-    (
-      (X == Y) -> write('Unfortunately, a group of minors are not allowed to travel.'), nl;
-      true
-    ).
+      (allMinors) -> write('Unfortunately, a group of minors are not allowed to travel.'), nl;
+      true.
 
 summary :-
     aggregate_all(count, can_travel(_), X),
     partysize(Y),
     (X < Y) -> true;
+    (allMinors) -> true;
     (
         (purpose('r')) -> write('Your party is fit for return travel!');
         (purpose('w')) -> write('Your party is fit for work travel!');
@@ -390,6 +387,17 @@ printCOVIDReqs() :-
 % --------------- Everything below is the knowledge base --------------- %
 
 % ---- RULES ---- %
+
+% PROFILE
+allMinors :-
+    aggregate_all(count, minor(_), X),
+    partysize(Y),
+    (
+      (X == Y) -> true;
+      fail
+    ).
+
+% COVID REQS
 
 % X has a validvaccine IF
 % X is vaccinated with a valid brand
