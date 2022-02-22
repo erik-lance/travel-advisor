@@ -19,24 +19,30 @@
 welcome:- 
     write('Trip Advisor Agent (TAA) Israel'),
     nl,
-    % ask('Would you like to travel to Israel?').
-    asknum('What is the size of your party? ', PartySize), nl,
-    (
-      (PartySize > 0, PartySize < 5) -> (
-        assert(partysize(PartySize)),
-        assert(partyindex(1)),
-        flight,
-        return,
-        profile,
-        minors,
-        summary,    
-        write('Thank you.')                           
-      );
-        write('Sorry, but your party must be at the size of 1-4 only.'),nl,
-        welcome
+    ask('Would you like to travel to Israel?','start'),
+    (yes(start)) -> (
+        asknum('What is the size of your party? ', PartySize), nl,
+        (
+        (PartySize > 0, PartySize < 5) -> (
+            assert(partysize(PartySize)),
+            assert(partyindex(1)),
+            flight,
+            return,
+            profile,
+            minors,
+            summary,    
+            write('Thank you.')                           
+        );
+            write('Sorry, but your party must be at the size of 1-4 only.'),nl,
+            welcome
+        )   
+    );
+    (no(start)) ->  (
+      write('Okay, thank you.')
     ).
     
-% Thes will be used for yes/no questions only.
+    
+% These will be used for yes/no questions only.
 ask(Question, Desc) :-
     write(Question), nl,
     write(' (yes/no) or (y/n)'),
